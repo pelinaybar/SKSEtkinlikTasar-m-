@@ -1103,6 +1103,11 @@
             if (el) el.textContent = text || '';
         }
 
+        function setEventsStatusWithKey(text) {
+            const wk = currentWeekKey || 'week_default';
+            setEventsStatus(`${text || ''}${text ? ' · ' : ''}${wk}`);
+        }
+
         const CLOUD_CFG_KEYS = {
             url: 'sks_supabase_url',
             anon: 'sks_supabase_anon',
@@ -1570,11 +1575,11 @@
                 try {
                     localStorage.setItem(getLocalEventsStorageKeyForWeekKey(weekKey), JSON.stringify(payload));
                     localStorage.setItem(EVENTS_LAST_WEEK_KEY, weekKey);
-                    setEventsStatus('💾 Kaydedildi');
+                    setEventsStatusWithKey('💾 Kaydedildi');
                 } catch (e) {
                     // Quota dolu olabilir -> IndexedDB’ye düş
                     console.warn('LocalStorage events kaydı başarısız:', e);
-                    setEventsStatus('⚠️ LocalStorage dolu, IndexedDB’ye kaydediliyor');
+                    setEventsStatusWithKey('⚠️ LocalStorage dolu, IndexedDB’ye kaydediliyor');
                 }
 
                 // 2) IndexedDB fallback (asenkron, fire-and-forget)
@@ -1582,7 +1587,7 @@
                 if (!skipCloud) scheduleCloudPush();
             } catch (e) {
                 console.warn('Etkinlikler kaydedilemedi:', e);
-                setEventsStatus('❌ Kaydedilemedi');
+                setEventsStatusWithKey('❌ Kaydedilemedi');
             }
         }
 
@@ -1612,7 +1617,7 @@
                 if (ok) {
                     // tekrar localStorage’a da yazmayı dene (fırsat)
                     try { localStorage.setItem(getLocalEventsStorageKeyForWeekKey(weekKey), JSON.stringify(payload)); } catch (_) {}
-                    setEventsStatus('✅ IndexedDB’den yüklendi');
+                    setEventsStatusWithKey('✅ IndexedDB’den yüklendi');
                     return true;
                 }
             }
@@ -1988,6 +1993,8 @@
             // Aynı güne ardışık etkinlik eklerken tarih/gün sıfırlanmasın
             clearForm({ keepDate: true });
             scheduleSaveEventsState();
+            // Yenileme çok hızlı yapılırsa kayıp olmasın diye anında da kaydet
+            saveEventsStateNow();
             
             // Başarı mesajı
             const successMsg = document.createElement('div');
@@ -4279,6 +4286,11 @@
             // Otomatik senkron açıksa bu haftayı bulutla otomatik eşitle
             try { await cloudAutoSyncResolveForWeek(); } catch (_) {}
         };
+
+        // Yenileme/kapatmada son anda kaydet (debounce beklememek için)
+        window.addEventListener('beforeunload', () => {
+            try { saveEventsStateNow({ skipCloud: true }); } catch (_) {}
+        });
     </script>
 </body>
 </html>
