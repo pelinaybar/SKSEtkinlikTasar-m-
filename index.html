@@ -2513,6 +2513,14 @@
                 if (events[day] && events[day].events.length > 0) {
                     const dayColor = dayColors[day];
                     const cols = Math.max(1, Math.min(5, events[day].events.length));
+                    // İç dizayn: sütun sayısı azsa kartlar genişliyor; estetik için iç ölçüleri büyüt.
+                    const cardHeight = cols <= 2 ? 170 : (cols === 3 ? 160 : 150);
+                    const cardPadding = cols <= 2 ? 18 : 15;
+                    const cardGap = cols <= 2 ? 16 : 12;
+                    const logoBox = cols <= 2 ? 64 : 50;
+                    const baseClubFont = cols <= 2 ? 13 : 12;
+                    const baseTitleFont = cols <= 2 ? 13 : 12;
+                    const baseMetaFont = cols <= 2 ? 12 : 11;
                     html += `
                         <div style="margin-top: 20px;">
                             <!-- Day Header -->
@@ -2527,22 +2535,22 @@
                                     const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
                                     const locationText = event.isOnline ? 'ZOOM Çevrimiçi' : event.location;
 
-                                    // Karakter analizi: uzun metinlerde punto küçült + kısalt
+                                    // Karakter analizi: uzun metinlerde punto küçült (kısaltma yok)
                                     const clubFit = fitTextForDesign(event.clubName, {
-                                        baseFont: 12,
-                                        steps: [{ len: 28, font: 11 }, { len: 40, font: 10 }, { len: 52, font: 9 }]
+                                        baseFont: baseClubFont,
+                                        steps: [{ len: 30, font: baseClubFont - 1 }, { len: 44, font: baseClubFont - 2 }, { len: 58, font: baseClubFont - 3 }]
                                     });
                                     const titleFit = fitTextForDesign(event.eventTitle, {
-                                        baseFont: 12,
-                                        steps: [{ len: 26, font: 11 }, { len: 38, font: 10 }, { len: 50, font: 9 }]
+                                        baseFont: baseTitleFont,
+                                        steps: [{ len: 28, font: baseTitleFont - 1 }, { len: 42, font: baseTitleFont - 2 }, { len: 56, font: baseTitleFont - 3 }]
                                     });
                                     const locationFit = fitTextForDesign(locationText, {
-                                        baseFont: 11,
-                                        steps: [{ len: 34, font: 10 }, { len: 48, font: 9 }]
+                                        baseFont: baseMetaFont,
+                                        steps: [{ len: 36, font: baseMetaFont - 1 }, { len: 52, font: baseMetaFont - 2 }]
                                     });
                                     const campusFit = fitTextForDesign(event.campus || '', {
-                                        baseFont: 10,
-                                        steps: [{ len: 30, font: 9 }, { len: 44, font: 8 }]
+                                        baseFont: cols <= 2 ? 11 : 10,
+                                        steps: [{ len: 32, font: (cols <= 2 ? 10 : 9) }, { len: 48, font: (cols <= 2 ? 9 : 8) }]
                                     });
                                     
                                     let logoHTML = '🎯';
@@ -2585,16 +2593,16 @@
                                     }
                                     
                                     return `
-                                        <div style="background: #2a7a7a; border-radius: 6px; padding: 15px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; height: 150px; overflow: hidden;">
-                                            <div style="width: 50px; height: 50px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <div style="background: #2a7a7a; border-radius: 8px; padding: ${cardPadding}px; display: flex; gap: ${cardGap}px; align-items: center; min-width: 0; height: ${cardHeight}px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+                                            <div style="width: ${logoBox}px; height: ${logoBox}px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                                 ${logoHTML}
                                             </div>
                                             <div style="flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;">
-                                                <div style="color: white; font-size: ${clubFit.fontSize}px; font-weight: 700; margin-bottom: 4px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${clubFit.text}</div>
-                                                <div style="color: #ffd700; font-size: ${titleFit.fontSize}px; font-weight: 700; margin-bottom: 6px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${titleFit.text}</div>
-                                                <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${escapeHtml(event.time)}</div>
-                                                <div style="color: ${locationColor}; font-size: ${locationFit.fontSize}px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${locationIcon} ${locationFit.text}</div>
-                                                ${event.campus ? `<div style="color: white; font-size: ${campusFit.fontSize}px; margin-top: 2px; opacity: 0.9; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">${campusFit.text}</div>` : ''}
+                                                <div style="color: white; font-size: ${clubFit.fontSize}px; font-weight: 700; margin-bottom: 6px; line-height: 1.2; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${clubFit.text}</div>
+                                                <div style="color: #ffd700; font-size: ${titleFit.fontSize}px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${titleFit.text}</div>
+                                                <div style="color: rgba(255,255,255,0.95); font-size: ${baseMetaFont}px; margin-bottom: 4px;">🕐 ${escapeHtml(event.time)}</div>
+                                                <div style="color: ${locationColor}; font-size: ${locationFit.fontSize}px; line-height: 1.2; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${locationIcon} ${locationFit.text}</div>
+                                                ${event.campus ? `<div style="color: rgba(255,255,255,0.92); font-size: ${campusFit.fontSize}px; margin-top: 4px; line-height: 1.2; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">${campusFit.text}</div>` : ''}
                                             </div>
                                         </div>
                                     `;
