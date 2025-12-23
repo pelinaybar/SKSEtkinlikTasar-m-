@@ -673,39 +673,169 @@
     </div>
 
     <script>
-        // Kulüp Listesi (LocalStorage'dan yüklenecek)
-        let clubNames = [
-            'Genç Yeryüzü Doktorları Kulübü', 'Geleceğin Liderleri Kulübü', 'Üsküdar Üniversitesi Tarih Kulübü',
-            'Perfüzyon Kulübü', 'Tarih ve Kültür Kulübü', 'Intercultural Kulübü',
-            'Sessizliği Boz Kulübü', 'STEM Projects Kulübü', 'İlk ve Acil Yardım Kulübü',
-            'Yeşilay Kulübü', 'Sosyoloji Kulübü', 'Üsküdar Üniversitesi Cansağlığı Kulübü',
-            'Üsküdar Çeviri Kulübü', 'Genç Gönüllüler Kulübü', 'Teknoloji ve İnovasyon Kulübü',
-            'Sağlık Yönetimi Kulübü', 'Senaryo Bazlı İSG Uygulamaları Kulübü', 'Fizyoterapi Kulübü',
-            'Lösemili Çocuklara Fayda Kulübü', 'Gazetecilik Kulübü', 'Çağın Vicdanı Kulübü',
-            'Hemşirelik Kulübü', 'Dil ve Konuşma Terapisi Kulübü', 'Sürdürülebilir Kalkınma Kulübü',
-            'Üsküdar Üniversitesi Spor Kulübü', 'Adli Bilimler Ve Ceza Adaleti Kulübü', 'İyiliğin Geleceği Kulübü',
-            'Ombudsman Kulübü', 'ÜÇEV', 'Milli Miras Kulübü',
-            'Yetenek Farkındalığı Kulübü', 'Genç Yeşilay Kulübü', 'Kalite Kulübü',
-            'Tiyatro Kulübü', 'Gençlik Kulübü', 'Tut Elimi Kulübü',
-            'Animasyon Kulübü', 'Tasarım Kulübü', 'ENLK Kulübü',
-            'Diyetüsk Kulübü', 'Çocuk Gelişimi Kulübü', 'Sinema Kulübü',
-            'Üsküdans Kulübü', 'Müzik Kulübü', 'EkoVizyon Kulübü',
-            'Yeni Medya Kulübü', 'IEEE Kulübü', 'Tıp Öğrencileri Birliği',
-            'Türk Kızılay Genç', 'Proje Geliştirme ve Gençlik Kulübü', 'STEM Kulübü',
-            'Meclis Kürsüsü Kulübü', 'ÜSKÜRAT', 'Pozitif Psikoloji Kulübü',
-            'Uluslararası Diplomasi Kulübü', 'Genç İletişimciler Kulübü', 'ENSA',
-            'Felsefe Kulübü', 'Diş Protez Kulübü', 'Moleküler Biyoloji ve Genetik Kulübü',
-            'Diş Hekimliği Öğrenci Birliği', 'Türkçe Konuşma Kulübü', 'Kültürel Keşif Kulübü',
-            'Elektronörofizyoloji Kulübü', 'Fikir ve Aksiyon Kulübü', 'DKT Kulübü',
-            'BİKULÜP', 'Laboratuvar Teknikleri Kulübü', 'TeknoFest Kulübü',
-            'Ergoterapi Kulübü', 'Eşit Adımlar', 'Odyoloji Kulübü',
-            'Gıda Kulübü', 'Bilişim Kulübü', 'Podoloji Kulübü',
-            'Genç Tıbbiyeliler Kulübü', 'BIOENGTEC', 'Okçuluk Kulübü',
-            'Anestezi Kulübü', 'Sosyal Hizmet Kulübü', 'AFAD Kulübü',
-            'MUN Kulübü', 'AI and Smart Systems Club', 'Mucizeye İlk Dokunuş Kulübü',
-            'Finansal Okuryazarlık Kulübü', 'İSG Kulübü', 'Nadir Hastalıklar Kulübü',
-            'Fizyoterapi ve Rehabilitasyon Kulübü', 'Genç Tıbbiyeliler Kulübü', 'Üsküdar Üniversitesi'
+        // Kulüp Listesi (Resmî Liste) — seçimde sadece bu adlar gösterilir.
+        // Not: Aşağıdaki ALIAS tablosu, eski/kısa isimleri otomatik olarak bu resmî adlara dönüştürmek için kullanılır.
+        const OFFICIAL_CLUB_NAMES = [
+            'Acil Durum Ve Afet Yönetimi Kulübü',
+            'Anestezi Kulübü',
+            'Beslenme Ve Diyetetik Kulübü',
+            'Bikutu ve Rol Yapma Oyunları Kulübü',
+            'Bilimsel Araştırma Kulübü (ÜSKÜBAT)',
+            'Biyomühendislik Kulübü',
+            'Büyüdüm Çocuk Oldum Kulübü',
+            'Chemical Engineering Society Kulübü',
+            'Codyle Kulübü',
+            'Çağın Vicdanı Kulübü',
+            'Çocuk Gelişimi Kulübü',
+            'Pozitif Psikoloji Kulübü',
+            'Dans Kulübü',
+            'Proje Geliştirme ve Gençlik Kulübü',
+            'Developer Student Club',
+            'Dil ve Konuşma Terapisi Kulübü',
+            'Diş Hekimliği Öğrenci Birliği Kulübü',
+            'Pixel Kulübü',
+            'EkoVizyon Kulübü',
+            'Endüstri Ve Liderlik Kulübü',
+            'Erasmus Community Kulübü (Erasmus Kulübü)',
+            'Ergoterapi Kulübü',
+            'Fikir ve Aksiyon Kulübü',
+            'Finansal Okuryazarlık Kulübü',
+            'Fizyoterapi Kulübü',
+            'Fizyoterapi ve Rehabilitasyon Kulübü',
+            'Gazetecilik Kulübü',
+            'Genç İletişimciler Kulübü',
+            'Genç Tıbbiyeliler Kulübü',
+            'Genç Yeryüzü Doktorları Kulübü',
+            'Gençlik Kulübü',
+            'Senaryo Bazlı İsg Uygulamaları Kulübü',
+            'Havacılık ve Girişimcilik Kulübü',
+            'Haydi Tut Elimi Kulübü',
+            'Sağlık Yönetimi Kulübü',
+            'Hekimlik ve Gelişim Kulübü',
+            'Hemşirelik Kulübü',
+            'IEEE ÜÜ. Öğr. Kolu Kulübü',
+            'Sosyal Hizmet Kulübü',
+            'Intercultural Kulübü',
+            'İyiliğin Geleceği Kulübü',
+            'Sinema Kulübü',
+            'Kalite Kulübü',
+            'Kızılay Kulübü',
+            'Kök Hücre ve Genetik Araştırmalar Kulübü',
+            'Laboratuvar Teknikerliği Kulübü',
+            'Meclis Kürsüsü Kulübü',
+            'Medikalde Teknobilim Kulübü',
+            'Sessizliği Boz Kulübü',
+            'Metaverse ve Girişimcilik Kulübü',
+            'Moleküler Biyoloji ve Genetik Kulübü',
+            'Mucizeye İlk Dokunuş Kulübü',
+            'Odyoloji Kulübü',
+            'Ombudsman Kulübü',
+            'Psikoloji Kulübü',
+            'Perfüzyon Kulübü',
+            'Sosyoloji Kulübü',
+            'Adli Bilimler Ve Ceza Adaleti Kulübü',
+            'Sağlık, Kültür ve Spor Daire Başkanlığı',
+            'STEM Projects Kulübü',
+            'Stratejik Arş. ve Geliştirme Kulübü',
+            'Sürdürülebilir Kalkınma Kulübü',
+            'Tarih ve Kültür Kulübü',
+            'Tasarım Kulübü',
+            'Teknoloji ve İnovasyon Kulübü',
+            'Tıp Öğrencileri Birliği Kulübü',
+            'Tiyatro Kulübü',
+            'Türkçe Konuşma Kulübü',
+            'Uluslararası Diplomasi Kulübü',
+            'Uluslararası Kudüs Gönüllüleri Kulübü',
+            'Ü.Ü. Model Birleşmiş Milletler Kulübü (MUN)',
+            'Üretken Reklamcılar ve Girişimciler Kulübü',
+            'Üsküdar Çeviri Kulübü',
+            'Üsküdar Üniversitesi Cansağlığı Kulübü',
+            'Üsküdar Üniversitesi Gıda Kulübü',
+            'Üsküdar Üniversitesi Nadir Hastalıklar Kulübü (ÜÜRARE)',
+            'Üsküdar Üniversitesi Nörobilim Kulübü',
+            'Üsküdar Üniversitesi Tarih Kulübü',
+            'Üsküdar Üniversitesi Teknofest Kulübü',
+            'Vikipedi Öğrenci Kulübü',
+            'Yapay Zeka Kulübü',
+            'Yeni Nesil Öğrenci Kulübü',
+            'Yeşilay Kulübü',
+            'Animasyon Kulübü',
+            'Diş Protez Kulübü',
+            'Eşit Adımlar Kulübü',
+            'Avrupa Tıp Öğrencileri Birliği (EMSA)',
+            'Geleceğin Liderleri Kulübü',
+            'Genç Gönüllüler Kulübü',
+            'Kültürel Keşif Kulübü',
+            'İlk Acil Yardım Kulübü',
+            'Lösemili Çocuklara Fayda Kulübü',
+            'Milli Miras Kulübü',
+            'Müzik Kulübü',
+            'Okçuluk Kulübü',
+            'Podoloji Kulübü',
+            'Üsküdar Üniversitesi Bilişim Kulübü',
+            'Üsküdar Üniversitesi Elektronörofizyoloji Kulübü',
+            'Üsküdar Üniversitesi Spor Kulübü',
+            'Yetenek Farkındalığı Kulübü',
+            'Felsefe Kulübü',
+            'Yeni Medya Kulübü'
         ];
+
+        // Eski/alternatif isim -> resmî isim
+        const CLUB_NAME_ALIASES = {
+            'AFAD Kulübü': 'Acil Durum Ve Afet Yönetimi Kulübü',
+            'Acil Durum ve Afet Yönetimi Kulübü': 'Acil Durum Ve Afet Yönetimi Kulübü',
+            'Diyetüsk Kulübü': 'Beslenme Ve Diyetetik Kulübü',
+            'Diyetüsk': 'Beslenme Ve Diyetetik Kulübü',
+            'BİKULÜP': 'Bikutu ve Rol Yapma Oyunları Kulübü',
+            'Bikutu': 'Bikutu ve Rol Yapma Oyunları Kulübü',
+            'DKT Kulübü': 'Dil ve Konuşma Terapisi Kulübü',
+            'Diş Hekimliği Öğrenci Birliği': 'Diş Hekimliği Öğrenci Birliği Kulübü',
+            'Tıp Öğrencileri Birliği': 'Tıp Öğrencileri Birliği Kulübü',
+            'IEEE Kulübü': 'IEEE ÜÜ. Öğr. Kolu Kulübü',
+            'ÜÇEV': 'Üsküdar Çeviri Kulübü',
+            'Türk Kızılay Genç': 'Kızılay Kulübü',
+            'Genç Yeşilay Kulübü': 'Yeşilay Kulübü',
+            'Üsküdans Kulübü': 'Dans Kulübü',
+            'Tut Elimi Kulübü': 'Haydi Tut Elimi Kulübü',
+            'TeknoFest Kulübü': 'Üsküdar Üniversitesi Teknofest Kulübü',
+            'Nadir Hastalıklar Kulübü': 'Üsküdar Üniversitesi Nadir Hastalıklar Kulübü (ÜÜRARE)',
+            'Bilişim Kulübü': 'Üsküdar Üniversitesi Bilişim Kulübü',
+            'Elektronörofizyoloji Kulübü': 'Üsküdar Üniversitesi Elektronörofizyoloji Kulübü',
+            'Gıda Kulübü': 'Üsküdar Üniversitesi Gıda Kulübü',
+            'BIOENGTEC': 'Biyomühendislik Kulübü',
+            'ENLK Kulübü': 'Endüstri Ve Liderlik Kulübü',
+            'ENSA': 'Erasmus Community Kulübü (Erasmus Kulübü)',
+            'AI and Smart Systems Club': 'Yapay Zeka Kulübü',
+            'STEM Kulübü': 'STEM Projects Kulübü',
+            'Senaryo Bazlı İSG Uygulamaları Kulübü': 'Senaryo Bazlı İsg Uygulamaları Kulübü',
+            'İSG Kulübü': 'Senaryo Bazlı İsg Uygulamaları Kulübü',
+            'Eşit Adımlar': 'Eşit Adımlar Kulübü',
+            'Laboratuvar Teknikleri Kulübü': 'Laboratuvar Teknikerliği Kulübü',
+            'İlk ve Acil Yardım Kulübü': 'İlk Acil Yardım Kulübü',
+            'MUN Kulübü': 'Ü.Ü. Model Birleşmiş Milletler Kulübü (MUN)',
+            'ÜSKÜRAT': 'Bilimsel Araştırma Kulübü (ÜSKÜBAT)'
+        };
+
+        function isOfficialClubName(name) {
+            return OFFICIAL_CLUB_NAMES.includes(name);
+        }
+
+        function canonicalizeClubName(input) {
+            const raw = (input || '').toString().trim();
+            if (!raw) return null;
+            if (isOfficialClubName(raw)) return raw;
+            if (CLUB_NAME_ALIASES[raw]) return CLUB_NAME_ALIASES[raw];
+
+            const rawNorm = normalizeKey(raw);
+            if (!rawNorm) return null;
+            for (const official of OFFICIAL_CLUB_NAMES) {
+                if (normalizeKey(official) === rawNorm) return official;
+            }
+            return null;
+        }
+
+        // Kulüp Listesi (çalışan liste)
+        let clubNames = [...OFFICIAL_CLUB_NAMES];
 
         // Kulüp Logoları Veritabanı - Gerçek dosya isimleriyle eşleştirildi
         let clubLogoDatabase = {
@@ -802,6 +932,42 @@
         
         // Base64 Logo Veritabanı (GitHub Pages için)
         let clubLogoBase64Database = {};
+
+        // Başlangıç veritabanlarını resmî isimlere taşı (alias/normalizasyon).
+        function migrateLogoDatabasesToOfficial() {
+            try {
+                const currentMap = clubLogoDatabase || {};
+                const currentB64 = clubLogoBase64Database || {};
+                const resultMap = {};
+                const resultB64 = {};
+
+                // Resmî listede olanları önceliklendir
+                OFFICIAL_CLUB_NAMES.forEach((official) => {
+                    if (currentMap[official]) resultMap[official] = currentMap[official];
+                    if (currentB64[official]) resultB64[official] = currentB64[official];
+                });
+
+                // Eski/alternatif anahtarları resmî anahtara taşı
+                Object.keys(currentMap).forEach((k) => {
+                    const canon = canonicalizeClubName(k);
+                    if (!canon) return;
+                    if (!resultMap[canon] && currentMap[k]) resultMap[canon] = currentMap[k];
+                });
+                Object.keys(currentB64).forEach((k) => {
+                    const canon = canonicalizeClubName(k);
+                    if (!canon) return;
+                    if (!resultB64[canon] && currentB64[k]) resultB64[canon] = currentB64[k];
+                });
+
+                clubLogoDatabase = resultMap;
+                clubLogoBase64Database = resultB64;
+            } catch (e) {
+                console.warn('Logo veritabanı migration hatası:', e);
+            }
+        }
+
+        // Sayfa açılışında bir kez uygula (hardcoded mapping'ler için)
+        migrateLogoDatabasesToOfficial();
 
         let events = {};
         let draggedElement = null;
@@ -929,9 +1095,10 @@
             
             const day = document.getElementById('daySelect').value;
             const fullDate = document.getElementById('fullDateFormatted').value || document.getElementById('fullDate').value;
-            const clubName = document.getElementById('clubName').value.trim();
+            const clubNameRaw = document.getElementById('clubName').value.trim();
+            const clubName = canonicalizeClubName(clubNameRaw);
             
-            console.log('Form değerleri:', { day, fullDate, clubName });
+            console.log('Form değerleri:', { day, fullDate, clubNameRaw, clubName });
             
             let clubIcon = '🎯';
             if (clubName) {
@@ -962,7 +1129,7 @@
                 return;
             }
             if (!clubName) {
-                alert('❌ Lütfen kulüp adı girin!');
+                alert('❌ Lütfen listeden geçerli bir kulüp seçin!\n\nİpucu: Kulüp alanına tıklayıp listeden seçin.');
                 return;
             }
             if (!eventTitle) {
@@ -1514,7 +1681,7 @@
                             </div>
                             
                             <!-- Events Grid -->
-                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
                                 ${events[day].events.map(event => {
                                     const locationIcon = event.isOnline ? '🌐' : '📍';
                                     const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
@@ -1565,11 +1732,11 @@
                                                 ${logoHTML}
                                             </div>
                                             <div style="flex: 1; min-width: 0;">
-                                                <div style="color: white; font-size: 11px; font-weight: bold; margin-bottom: 4px;">${event.clubName}</div>
-                                                <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">${event.eventTitle}</div>
+                                                <div style="color: white; font-size: 11px; font-weight: bold; margin-bottom: 4px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.clubName}</div>
+                                                <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.eventTitle}</div>
                                                 <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${event.time}</div>
-                                                <div style="color: ${locationColor}; font-size: 11px;">${locationIcon} ${locationText}</div>
-                                                ${event.campus ? `<div style="color: white; font-size: 10px; margin-top: 2px; opacity: 0.9;">${event.campus}</div>` : ''}
+                                                <div style="color: ${locationColor}; font-size: 11px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${locationIcon} ${locationText}</div>
+                                                ${event.campus ? `<div style="color: white; font-size: 10px; margin-top: 2px; opacity: 0.9; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.campus}</div>` : ''}
                                             </div>
                                         </div>
                                     `;
@@ -1978,8 +2145,15 @@
                     const newValue = input.value.trim();
                     if (newValue && newValue !== originalText) {
                         if (field === 'clubName') {
-                            events[day].events[index].clubName = newValue;
-                            const logoSrc = getLogoSource(newValue);
+                            const canon = canonicalizeClubName(newValue);
+                            if (!canon) {
+                                alert('❌ Geçersiz kulüp adı.\n\nLütfen resmî listeden bir kulüp seçin.');
+                                element.classList.remove('editing');
+                                renderEvents();
+                                return;
+                            }
+                            events[day].events[index].clubName = canon;
+                            const logoSrc = getLogoSource(canon);
                             events[day].events[index].clubIcon = logoSrc || '🎯';
                         } else if (field === 'eventTitle') {
                             events[day].events[index].eventTitle = newValue;
@@ -2203,11 +2377,11 @@
 
         function filterClubList() {
             const input = document.getElementById('clubName');
-            const value = input.value.toLowerCase();
+            const valueNorm = normalizeKey(input.value || '');
             const datalist = document.getElementById('clubList');
             
             datalist.innerHTML = '';
-            clubNames.filter(club => club.toLowerCase().includes(value)).forEach(club => {
+            clubNames.filter(club => normalizeKey(club).includes(valueNorm)).forEach(club => {
                 const option = document.createElement('option');
                 option.value = club;
                 datalist.appendChild(option);
@@ -2241,6 +2415,8 @@
             const clubNameInput = document.getElementById('clubName');
             if (clubNameInput) {
                 clubNameInput.addEventListener('change', function() {
+                    const canon = canonicalizeClubName(this.value);
+                    if (canon) this.value = canon;
                     updateLogoPreview(this.value);
                 });
                 clubNameInput.addEventListener('input', function() {
@@ -2775,27 +2951,25 @@
                 const response = await fetch('logos.json');
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    // Kulüp listesini yükle
-                    if (data.clubNames && Array.isArray(data.clubNames) && data.clubNames.length > 0) {
-                        clubNames = [...new Set([...data.clubNames, ...clubNames])].sort();
-                        console.log(`✅ ${data.clubNames.length} kulüp logos.json'dan yüklendi`);
-                    }
+                    // Kulüp listesi: seçimde sadece resmî liste kullanılacak.
+                    clubNames = [...OFFICIAL_CLUB_NAMES];
                     
                     if (data.logos && Object.keys(data.logos).length > 0) {
                         // Base64 logoları yükle (logos.json'dan gelenler öncelikli)
-                        Object.keys(data.logos).forEach(club => {
-                            if (data.logos[club]) {
-                                clubLogoBase64Database[club] = data.logos[club];
+                        Object.keys(data.logos).forEach((club) => {
+                            const canon = canonicalizeClubName(club);
+                            if (canon && data.logos[club]) {
+                                clubLogoBase64Database[canon] = data.logos[club];
                             }
                         });
                         console.log(`✅ ${Object.keys(data.logos).length} base64 logo yüklendi`);
                     }
                     if (data.mappings && Object.keys(data.mappings).length > 0) {
                         // Logo eşleştirmelerini yükle (logos.json'dan gelenler öncelikli)
-                        Object.keys(data.mappings).forEach(club => {
-                            if (data.mappings[club]) {
-                                clubLogoDatabase[club] = data.mappings[club];
+                        Object.keys(data.mappings).forEach((club) => {
+                            const canon = canonicalizeClubName(club);
+                            if (canon && data.mappings[club]) {
+                                clubLogoDatabase[canon] = data.mappings[club];
                             }
                         });
                         console.log(`✅ ${Object.keys(data.mappings).length} logo eşleştirmesi yüklendi`);
@@ -2824,10 +2998,12 @@
                 try {
                     const savedDatabase = JSON.parse(saved);
                     // LocalStorage'dan gelen verileri ekle (sadece başlangıç veritabanında olmayanlar)
-                    Object.keys(savedDatabase).forEach(club => {
+                    Object.keys(savedDatabase).forEach((club) => {
+                        const canon = canonicalizeClubName(club);
+                        if (!canon) return;
                         // Eğer başlangıç veritabanında yoksa veya LocalStorage'daki path geçerliyse ekle
-                        if (savedDatabase[club] && (!clubLogoDatabase[club] || savedDatabase[club].startsWith('data:'))) {
-                            clubLogoDatabase[club] = savedDatabase[club];
+                        if (savedDatabase[club] && (!clubLogoDatabase[canon] || savedDatabase[club].startsWith('data:'))) {
+                            clubLogoDatabase[canon] = savedDatabase[club];
                         }
                     });
                 } catch (e) {
@@ -2841,9 +3017,11 @@
                 try {
                     const localBase64 = JSON.parse(savedBase64);
                     // LocalStorage'dan gelen base64 logoları ekle
-                    Object.keys(localBase64).forEach(club => {
+                    Object.keys(localBase64).forEach((club) => {
+                        const canon = canonicalizeClubName(club);
+                        if (!canon) return;
                         if (localBase64[club]) {
-                            clubLogoBase64Database[club] = localBase64[club];
+                            clubLogoBase64Database[canon] = localBase64[club];
                         }
                     });
                 } catch (e) {
@@ -2888,36 +3066,51 @@
                 return null;
             }
             
-            // Trim ve normalize et
-            const normalizedName = clubName.trim();
+            // Önce resmî isme çevir (mümkünse)
+            const raw = clubName.trim();
+            const canon = canonicalizeClubName(raw) || raw;
+            const candidates = [canon, raw];
+            // Canon için eski alias anahtarlarını da dene (geriye dönük)
+            if (canon) {
+                Object.keys(CLUB_NAME_ALIASES).forEach((k) => {
+                    if (CLUB_NAME_ALIASES[k] === canon) candidates.push(k);
+                });
+            }
+            const uniq = [...new Set(candidates.filter(Boolean).map(s => s.trim()).filter(Boolean))];
             
             // Önce base64 veritabanında kontrol et
-            if (clubLogoBase64Database && clubLogoBase64Database[normalizedName]) {
-                console.log('Base64 logo bulundu:', normalizedName);
-                return clubLogoBase64Database[normalizedName];
+            for (const name of uniq) {
+                if (clubLogoBase64Database && clubLogoBase64Database[name]) {
+                    console.log('Base64 logo bulundu:', name);
+                    return clubLogoBase64Database[name];
+                }
             }
             
             // Sonra logo path veritabanında kontrol et (tam eşleşme)
-            if (clubLogoDatabase && clubLogoDatabase[normalizedName]) {
-                const logoPath = clubLogoDatabase[normalizedName];
-                console.log('Logo path bulundu (tam eşleşme):', normalizedName, '->', logoPath);
-                return logoPath;
+            for (const name of uniq) {
+                if (clubLogoDatabase && clubLogoDatabase[name]) {
+                    const logoPath = clubLogoDatabase[name];
+                    console.log('Logo path bulundu (tam eşleşme):', name, '->', logoPath);
+                    return logoPath;
+                }
             }
             
             // Tam eşleşme yoksa, büyük/küçük harf duyarsız tam eşleşme dene
             if (clubLogoDatabase) {
+                const uniqLower = uniq.map(s => s.toLowerCase().trim());
                 for (const key in clubLogoDatabase) {
-                    if (key.toLowerCase().trim() === normalizedName.toLowerCase().trim()) {
+                    const keyLower = (key || '').toLowerCase().trim();
+                    if (uniqLower.includes(keyLower)) {
                         const logoPath = clubLogoDatabase[key];
-                        console.log('Logo path bulundu (büyük/küçük harf duyarsız):', normalizedName, '->', key, '->', logoPath);
+                        console.log('Logo path bulundu (büyük/küçük harf duyarsız):', canon, '->', key, '->', logoPath);
                         return logoPath;
                     }
                 }
             }
             
-            console.log('Logo bulunamadı:', normalizedName);
+            console.log('Logo bulunamadı:', canon);
             console.log('Mevcut kulüpler:', Object.keys(clubLogoDatabase || {}).slice(0, 10));
-            console.log('Aranan isim:', normalizedName);
+            console.log('Aranan isim:', canon);
             
             // Hiçbiri yoksa null döndür (emoji gösterilecek)
             return null;
@@ -2979,16 +3172,8 @@
         
         // Kulüp Yönetimi Fonksiyonları
         function loadClubNames() {
-            const saved = localStorage.getItem('clubNames');
-            if (saved) {
-                try {
-                    const savedClubs = JSON.parse(saved);
-                    // Mevcut listeyle birleştir (savedClubs öncelikli)
-                    clubNames = [...new Set([...savedClubs, ...clubNames])].sort();
-                } catch (e) {
-                    console.warn('Kulüp listesi yüklenemedi:', e);
-                }
-            }
+            // Seçim listesi her zaman resmî listedir.
+            clubNames = [...OFFICIAL_CLUB_NAMES];
         }
         
         function saveClubNames() {
@@ -3029,9 +3214,16 @@
                 return;
             }
             
+            // Resmî liste dışına çıkmayı engelle
+            const canon = canonicalizeClubName(newName);
+            if (!canon) {
+                alert('❌ Bu isim resmî kulüp listesinde yok.\n\nLütfen resmî listeden bir kulüp adı seçin/kopyalayın.');
+                return;
+            }
+            
             if (oldName) {
                 // Düzenleme modu
-                if (oldName === newName) {
+                if (oldName === canon) {
                     closeAddClubModal();
                     return;
                 }
@@ -3039,15 +3231,15 @@
                 // Eski adı yeni adla değiştir
                 const index = clubNames.indexOf(oldName);
                 if (index !== -1) {
-                    clubNames[index] = newName;
+                    clubNames[index] = canon;
                     
                     // Logo veritabanını güncelle
                     if (clubLogoDatabase[oldName]) {
-                        clubLogoDatabase[newName] = clubLogoDatabase[oldName];
+                        clubLogoDatabase[canon] = clubLogoDatabase[oldName];
                         delete clubLogoDatabase[oldName];
                     }
                     if (clubLogoBase64Database[oldName]) {
-                        clubLogoBase64Database[newName] = clubLogoBase64Database[oldName];
+                        clubLogoBase64Database[canon] = clubLogoBase64Database[oldName];
                         delete clubLogoBase64Database[oldName];
                     }
                     
@@ -3055,18 +3247,17 @@
                     localStorage.setItem('clubLogoDatabase', JSON.stringify(clubLogoDatabase));
                     localStorage.setItem('clubLogoBase64Database', JSON.stringify(clubLogoBase64Database));
                     
-                    alert(`✅ Kulüp adı güncellendi!\n\nEski: ${oldName}\nYeni: ${newName}`);
+                    alert(`✅ Kulüp adı güncellendi!\n\nEski: ${oldName}\nYeni: ${canon}`);
                 }
             } else {
                 // Yeni ekleme modu
-                if (clubNames.includes(newName)) {
+                if (clubNames.includes(canon)) {
                     alert('⚠️ Bu kulüp zaten listede var!');
                     return;
                 }
                 
-                clubNames.push(newName);
-                clubNames.sort();
-                alert(`✅ Yeni kulüp eklendi: ${newName}`);
+                clubNames.push(canon);
+                alert(`✅ Yeni kulüp eklendi: ${canon}`);
             }
             
             saveClubNames();
