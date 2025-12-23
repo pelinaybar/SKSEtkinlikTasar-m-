@@ -376,6 +376,29 @@
             .events-grid {
                 grid-template-columns: 1fr;
             }
+
+            /* Supabase bulut senkron bloğu - mobil uyum */
+            .cloud-grid-2 {
+                grid-template-columns: 1fr !important;
+            }
+            .cloud-actions {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .cloud-actions button,
+            .cloud-actions label {
+                width: 100% !important;
+                justify-content: center;
+            }
+            .cloud-actions span {
+                width: 100% !important;
+            }
+            .cloud-panel {
+                padding: 12px !important;
+            }
+            .cloud-panel input {
+                font-size: 14px !important;
+            }
         }
     </style>
 </head>
@@ -480,13 +503,13 @@
             </div>
 
             <!-- Bulut Senkron (Ücretsiz DB: Supabase) -->
-            <div style="margin-top: 20px; padding: 14px; border: 2px dashed #cfe2ff; background: #eef5ff; border-radius: 10px;">
+            <div class="cloud-panel" style="margin-top: 20px; padding: 14px; border: 2px dashed #cfe2ff; background: #eef5ff; border-radius: 10px;">
                 <div style="font-weight: 800; color:#0b4aa2; margin-bottom: 8px;">☁️ Bulut Senkron (Supabase - Ücretsiz)</div>
                 <div style="font-size: 12px; color:#234; line-height: 1.5; margin-bottom: 10px;">
                     Bu bölüm, etkinlikleri tarayıcı yenilense bile <b>ortak bir online veritabanında</b> saklamanızı sağlar.
                     <br><b>Not:</b> Güvenlik için Supabase’de RLS/policy ayarlamanız önerilir.
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="cloud-grid-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Supabase URL</div>
                         <input id="supabaseUrl" type="text" placeholder="https://xxxx.supabase.co" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
@@ -496,7 +519,7 @@
                         <input id="supabaseAnonKey" type="password" placeholder="eyJhbGciOi..." style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div class="cloud-grid-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
                     <div>
                         <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Admin Email</div>
                         <input id="supabaseEmail" type="email" placeholder="ornek@uskudar.edu.tr" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
@@ -506,7 +529,7 @@
                         <input id="supabasePassword" type="password" placeholder="••••••••" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
                     </div>
                 </div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; align-items:center;">
+                <div class="cloud-actions" style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; align-items:center;">
                     <button class="btn btn-info" onclick="saveSupabaseConfig()" style="background:#0d6efd; color:white;">💾 Ayarları Kaydet</button>
                     <button class="btn btn-primary" onclick="supabaseAuthLogin()" style="background:#0b5ed7; color:white;">🔐 Giriş</button>
                     <button class="btn btn-secondary" onclick="supabaseAuthLogout()" style="background:#adb5bd; color:#1b1f23;">🚪 Çıkış</button>
