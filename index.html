@@ -1054,7 +1054,9 @@
         let draggedElement = null;
 
         // Etkinlik verisini yenilemede kaybetmemek için localStorage'a otomatik kaydet/geri yükle
-        const EVENTS_STORAGE_KEY = 'sks_events_state_v1';
+        // Her hafta ayrı kayıt: localStorage key’i hafta anahtarına göre türetilir.
+        const EVENTS_STORAGE_KEY_PREFIX = 'sks_events_state_v1_';
+        const EVENTS_LAST_WEEK_KEY = 'sks_events_last_week_key';
         let _eventsSaveTimer = null;
         let _cloudSaveTimer = null;
 
@@ -1099,6 +1101,15 @@
             const base = `${w.startDate || ''}_${w.endDate || ''}`.trim();
             const key = normalizeKey(base) || 'default';
             return `week_${key}`;
+        }
+
+        function getWeekKeyForLocal() {
+            // Cloud ile aynı mantıkta, ama local key prefix'i farklı
+            return getWeekKeyForCloud();
+        }
+
+        function getLocalEventsStorageKey() {
+            return EVENTS_STORAGE_KEY_PREFIX + getWeekKeyForLocal();
         }
 
         async function supabaseRequest(path, { method = 'GET', headers = {}, body } = {}) {
@@ -1197,6 +1208,86 @@
             }
         }
 
+        async function cloudFetchPayload(week_key) {
+            const data = await supabaseRequest(`/rest/v1/events_state?week_key=eq.${encodeURIComponent(week_key)}&select=payload`, { method: 'GET' });
+            const row = Array.isArray(data) ? data[0] : null;
+            return row?.payload || null;
+        }
+
+        function localHasEvents() {
+            return Object.keys(events || {}).some((k) => (events[k]?.events || []).length > 0);
+        }
+
+        function parseISO(iso) {
+            const t = Date.parse(iso || '');
+            return Number.isFinite(t) ? t : 0;
+        }
+
+        // Otomatik senkron: aynı hafta için hangisi daha yeniyse onu seç (pull veya push)
+        async function cloudAutoSyncResolveForWeek() {
+            const cfg = getSupabaseConfig();
+            if (!cfg.auto) return;
+            const week_key = getWeekKeyForCloud();
+            try {
+                setCloudStatus('🔁 Bulut senkron kontrol ediliyor...');
+                const cloud = await cloudFetchPayload(week_key).catch(() => null);
+                const localKey = getLocalEventsStorageKey();
+                const localRaw = localStorage.getItem(localKey);
+                const localParsed = localRaw ? JSON.parse(localRaw) : null;
+
+                const cloudSaved = parseISO(cloud?.savedAt);
+                const localSaved = parseISO(localParsed?.savedAt);
+
+                // Bulutta yoksa: lokalde veri varsa push
+                if (!cloud) {
+                    if (localHasEvents()) {
+                        await cloudPushEvents();
+                    } else {
+                        setCloudStatus('ℹ️ Bulutta veri yok (boş hafta).');
+                    }
+                    return;
+                }
+
+                // Lokalde yoksa: pull
+                if (!localParsed || !localHasEvents()) {
+                    // sessiz pull (prompt yok)
+                    if (cloud.week) setWeekStateToInputs(cloud.week);
+                    if (cloud.dayDateISO && typeof cloud.dayDateISO === 'object') {
+                        Object.keys(cloud.dayDateISO).forEach((k) => { dayDateISO[k] = cloud.dayDateISO[k]; });
+                    }
+                    events = cloud.events || {};
+                    hydrateEventsAfterLoad();
+                    refreshEventLogosFromDatabase();
+                    renderEvents();
+                    saveEventsStateNow();
+                    setCloudStatus('✅ Buluttan otomatik yüklendi.');
+                    return;
+                }
+
+                // İkisi de varsa: daha yeni olan kazanır
+                if (cloudSaved > localSaved) {
+                    events = cloud.events || {};
+                    if (cloud.week) setWeekStateToInputs(cloud.week);
+                    if (cloud.dayDateISO && typeof cloud.dayDateISO === 'object') {
+                        Object.keys(cloud.dayDateISO).forEach((k) => { dayDateISO[k] = cloud.dayDateISO[k]; });
+                    }
+                    hydrateEventsAfterLoad();
+                    refreshEventLogosFromDatabase();
+                    renderEvents();
+                    saveEventsStateNow();
+                    setCloudStatus('✅ Bulut daha yeni: otomatik çekildi.');
+                } else if (localSaved > cloudSaved) {
+                    await cloudPushEvents();
+                    setCloudStatus('✅ Lokal daha yeni: otomatik gönderildi.');
+                } else {
+                    setCloudStatus('✅ Bulut/Lokal zaten aynı (tarih eşit).');
+                }
+            } catch (e) {
+                console.warn('Auto sync hatası:', e);
+                setCloudStatus('⚠️ Otomatik senkron başarısız.');
+            }
+        }
+
         function scheduleCloudPush() {
             const cfg = getSupabaseConfig();
             if (!cfg.auto) return;
@@ -1277,7 +1368,8 @@
                     dayDateISO: { ...dayDateISO },
                     events: serializeEventsForStorage(events)
                 };
-                localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(payload));
+                localStorage.setItem(getLocalEventsStorageKey(), JSON.stringify(payload));
+                localStorage.setItem(EVENTS_LAST_WEEK_KEY, getWeekKeyForLocal());
                 scheduleCloudPush();
             } catch (e) {
                 console.warn('Etkinlikler kaydedilemedi:', e);
@@ -1291,7 +1383,17 @@
 
         function loadEventsStateFromStorage() {
             try {
-                const raw = localStorage.getItem(EVENTS_STORAGE_KEY);
+                // Önce bu hafta key'i ile yükle
+                let raw = localStorage.getItem(getLocalEventsStorageKey());
+                // Eski tekil key’den migration (varsa)
+                if (!raw) {
+                    const legacy = localStorage.getItem('sks_events_state_v1');
+                    if (legacy) {
+                        raw = legacy;
+                        // Bu haftaya kopyala (ilk geçiş)
+                        localStorage.setItem(getLocalEventsStorageKey(), legacy);
+                    }
+                }
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
                 if (!parsed || typeof parsed !== 'object') return false;
@@ -1317,9 +1419,34 @@
             const endEl = document.getElementById('endDate');
             [startEl, endEl].forEach((el) => {
                 if (!el) return;
-                el.addEventListener('input', () => scheduleSaveEventsState());
-                el.addEventListener('change', () => scheduleSaveEventsState());
+                el.addEventListener('input', () => onWeekInputsChanged());
+                el.addEventListener('change', () => onWeekInputsChanged());
             });
+        }
+
+        function resetWeekStateInMemory() {
+            // Bu haftaya geçerken önce form state'i temizle
+            Object.keys(dayDateISO).forEach((k) => { delete dayDateISO[k]; });
+            events = {};
+        }
+
+        function loadLocalWeekOrEmpty() {
+            // Bu hafta için local kayıt varsa yükle, yoksa boşalt
+            const ok = loadEventsStateFromStorage();
+            if (!ok) {
+                resetWeekStateInMemory();
+            }
+            hydrateEventsAfterLoad();
+            refreshEventLogosFromDatabase();
+            try { renderEvents(); } catch (_) {}
+        }
+
+        function onWeekInputsChanged() {
+            // Önce mevcut haftayı kaydet, sonra yeni haftaya geç
+            try { saveEventsStateNow(); } catch (_) {}
+            loadLocalWeekOrEmpty();
+            // Auto sync açıksa yeni hafta için bulutla çöz
+            cloudAutoSyncResolveForWeek();
         }
 
         // Paylaşımlı kullanım için: repoya konan events-data.json'dan etkinlikleri yükle (varsa)
@@ -3886,6 +4013,9 @@
                 if (autoEl) autoEl.checked = !!cfg.auto;
                 if (cfg.auto) setCloudStatus('🔁 Otomatik senkron açık');
             } catch (_) {}
+
+            // Otomatik senkron açıksa bu haftayı bulutla otomatik eşitle
+            try { await cloudAutoSyncResolveForWeek(); } catch (_) {}
         };
     </script>
 </body>
