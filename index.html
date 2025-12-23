@@ -834,6 +834,53 @@
             return null;
         }
 
+        // Tasarım çıktısı için güvenli metin + karakter analizi ile otomatik punto/kısaltma
+        function escapeHtml(str) {
+            return (str ?? '')
+                .toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function graphemeLength(str) {
+            try {
+                // Unicode birleşik karakterler için daha doğru sayım (destek varsa)
+                if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                    const seg = new Intl.Segmenter('tr', { granularity: 'grapheme' });
+                    let c = 0;
+                    for (const _ of seg.segment(str || '')) c++;
+                    return c;
+                }
+            } catch (_) {}
+            return Array.from(str || '').length;
+        }
+
+        function truncateWithEllipsis(str, maxChars) {
+            const s = (str ?? '').toString().trim();
+            if (!maxChars || maxChars <= 0) return s;
+            if (graphemeLength(s) <= maxChars) return s;
+            const arr = Array.from(s);
+            const cut = Math.max(0, maxChars - 1);
+            return arr.slice(0, cut).join('').trimEnd() + '…';
+        }
+
+        // opts: { baseFont, steps: [{len, font}], maxChars }
+        function fitTextForDesign(str, opts) {
+            const raw = (str ?? '').toString().trim();
+            const len = graphemeLength(raw);
+            let fontSize = opts?.baseFont ?? 12;
+            const steps = Array.isArray(opts?.steps) ? opts.steps : [];
+            for (const step of steps) {
+                if (len >= step.len) fontSize = step.font;
+            }
+            const maxChars = opts?.maxChars ?? 60;
+            const clipped = truncateWithEllipsis(raw, maxChars);
+            return { text: escapeHtml(clipped), fontSize };
+        }
+
         // Kulüp Listesi (çalışan liste)
         let clubNames = [...OFFICIAL_CLUB_NAMES];
 
@@ -1686,6 +1733,28 @@
                                     const locationIcon = event.isOnline ? '🌐' : '📍';
                                     const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
                                     const locationText = event.isOnline ? 'ZOOM Çevrimiçi' : event.location;
+
+                                    // Karakter analizi: uzun metinlerde punto küçült + kısalt
+                                    const clubFit = fitTextForDesign(event.clubName, {
+                                        baseFont: 12,
+                                        steps: [{ len: 28, font: 11 }, { len: 40, font: 10 }, { len: 52, font: 9 }],
+                                        maxChars: 64
+                                    });
+                                    const titleFit = fitTextForDesign(event.eventTitle, {
+                                        baseFont: 12,
+                                        steps: [{ len: 26, font: 11 }, { len: 38, font: 10 }, { len: 50, font: 9 }],
+                                        maxChars: 70
+                                    });
+                                    const locationFit = fitTextForDesign(locationText, {
+                                        baseFont: 11,
+                                        steps: [{ len: 34, font: 10 }, { len: 48, font: 9 }],
+                                        maxChars: 80
+                                    });
+                                    const campusFit = fitTextForDesign(event.campus || '', {
+                                        baseFont: 10,
+                                        steps: [{ len: 30, font: 9 }, { len: 44, font: 8 }],
+                                        maxChars: 60
+                                    });
                                     
                                     let logoHTML = '🎯';
                                     if (event.clubIcon) {
@@ -1732,11 +1801,11 @@
                                                 ${logoHTML}
                                             </div>
                                             <div style="flex: 1; min-width: 0;">
-                                                <div style="color: white; font-size: 12px; font-weight: 700; margin-bottom: 4px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.clubName}</div>
-                                                <div style="color: #ffd700; font-size: 12px; font-weight: 700; margin-bottom: 6px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.eventTitle}</div>
-                                                <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${event.time}</div>
-                                                <div style="color: ${locationColor}; font-size: 11px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${locationIcon} ${locationText}</div>
-                                                ${event.campus ? `<div style="color: white; font-size: 10px; margin-top: 2px; opacity: 0.9; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${event.campus}</div>` : ''}
+                                                <div style="color: white; font-size: ${clubFit.fontSize}px; font-weight: 700; margin-bottom: 4px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${clubFit.text}</div>
+                                                <div style="color: #ffd700; font-size: ${titleFit.fontSize}px; font-weight: 700; margin-bottom: 6px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${titleFit.text}</div>
+                                                <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${escapeHtml(event.time)}</div>
+                                                <div style="color: ${locationColor}; font-size: ${locationFit.fontSize}px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${locationIcon} ${locationFit.text}</div>
+                                                ${event.campus ? `<div style="color: white; font-size: ${campusFit.fontSize}px; margin-top: 2px; opacity: 0.9; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">${campusFit.text}</div>` : ''}
                                             </div>
                                         </div>
                                     `;
