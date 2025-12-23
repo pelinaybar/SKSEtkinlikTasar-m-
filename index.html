@@ -1017,6 +1017,8 @@
         migrateLogoDatabasesToOfficial();
 
         let events = {};
+        // Gün bazlı tarih hafızası (ISO: YYYY-MM-DD). Gün değiştirip geri gelince tarihi otomatik geri doldurur.
+        const dayDateISO = {};
         let draggedElement = null;
 
         // Debug logları (production'da kapalı)
@@ -1141,6 +1143,7 @@
             console.log('addEvent çağrıldı');
             
             const day = document.getElementById('daySelect').value;
+            const dateInputEl = document.getElementById('fullDate');
             const fullDate = document.getElementById('fullDateFormatted').value || document.getElementById('fullDate').value;
             const clubNameRaw = document.getElementById('clubName').value.trim();
             const clubName = canonicalizeClubName(clubNameRaw);
@@ -1196,8 +1199,13 @@
                 events[day] = {
                     dayName: day,
                     date: fullDate,
+                    isoDate: dateInputEl?.value || '',
                     events: []
                 };
+            } else {
+                // Aynı güne yeni etkinlik eklerken tarih/isoDate bilgisini güncel tut
+                events[day].date = fullDate;
+                events[day].isoDate = dateInputEl?.value || events[day].isoDate || '';
             }
 
             events[day].events.push({
@@ -1218,7 +1226,8 @@
             });
 
             renderEvents();
-            clearForm();
+            // Aynı güne ardışık etkinlik eklerken tarih/gün sıfırlanmasın
+            clearForm({ keepDate: true });
             
             // Başarı mesajı
             const successMsg = document.createElement('div');
@@ -1243,6 +1252,7 @@
         function formatSelectedDate() {
             const dateInput = document.getElementById('fullDate');
             const formattedInput = document.getElementById('fullDateFormatted');
+            const daySelect = document.getElementById('daySelect');
             
             if (dateInput.value) {
                 const date = new Date(dateInput.value);
@@ -1253,6 +1263,16 @@
                 const year = date.getFullYear();
                 
                 formattedInput.value = `${day} ${month} ${year}`;
+
+                // Gün bazlı hafızaya yaz
+                const selectedDay = daySelect?.value;
+                if (selectedDay) {
+                    dayDateISO[selectedDay] = dateInput.value;
+                    if (events[selectedDay]) {
+                        events[selectedDay].isoDate = dateInput.value;
+                        events[selectedDay].date = formattedInput.value;
+                    }
+                }
             } else {
                 formattedInput.value = '';
             }
@@ -1264,6 +1284,15 @@
             const startDateInput = document.getElementById('startDate');
             
             if (!daySelect.value) return;
+
+            // Önce daha önce bu gün için seçilmiş tarihi geri yükle
+            const selectedDay = daySelect.value;
+            const savedIso = (events[selectedDay] && events[selectedDay].isoDate) || dayDateISO[selectedDay];
+            if (savedIso) {
+                dateInput.value = savedIso;
+                formatSelectedDate();
+                return;
+            }
             
             const startDateText = startDateInput.value;
             if (startDateText) {
@@ -1294,13 +1323,16 @@
                             
                             dateInput.value = `${year}-${month}-${date}`;
                             formatSelectedDate();
+                            // Yeni öneriyi gün bazlı hafızaya yaz
+                            dayDateISO[selectedDay] = dateInput.value;
                         }
                     }
                 }
             }
         }
 
-        function clearForm() {
+        function clearForm(options = {}) {
+            const keepDate = options && options.keepDate === true;
             document.getElementById('clubName').value = '';
             updateLogoPreview('');
             document.getElementById('eventTitle').value = '';
@@ -1308,8 +1340,10 @@
             document.getElementById('eventLocation').value = '';
             document.getElementById('campusSelect').value = '';
             document.getElementById('isOnline').checked = false;
-            document.getElementById('fullDate').value = '';
-            document.getElementById('fullDateFormatted').value = '';
+            if (!keepDate) {
+                document.getElementById('fullDate').value = '';
+                document.getElementById('fullDateFormatted').value = '';
+            }
         }
         
         // Logo yükleme ve base64'e çevirme - Logos klasöründen direkt al
