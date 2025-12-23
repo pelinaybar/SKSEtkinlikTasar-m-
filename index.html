@@ -4243,7 +4243,17 @@
             } catch (_) {}
 
             // Etkinlikleri localStorage/IndexedDB'den geri yükle (varsa)
-            const restored = await loadEventsStateAuto(currentWeekKey);
+            // Not: "her hafta ayrı kayıt" olduğundan, sayfa açılışında EN SON kullanılan hafta otomatik yüklenir.
+            let restored = false;
+            try {
+                const lastWeekKey = localStorage.getItem(EVENTS_LAST_WEEK_KEY);
+                if (lastWeekKey) {
+                    restored = await loadEventsStateAuto(lastWeekKey);
+                }
+            } catch (_) {}
+            if (!restored) {
+                restored = await loadEventsStateAuto(currentWeekKey);
+            }
 
             // Yükleme sonrası mevcut etkinlikler varsa logoları güncelle ve listeyi yenile
             refreshEventLogosFromDatabase();
