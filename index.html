@@ -927,16 +927,8 @@
             return Array.from(str || '').length;
         }
 
-        function truncateWithEllipsis(str, maxChars) {
-            const s = (str ?? '').toString().trim();
-            if (!maxChars || maxChars <= 0) return s;
-            if (graphemeLength(s) <= maxChars) return s;
-            const arr = Array.from(s);
-            const cut = Math.max(0, maxChars - 1);
-            return arr.slice(0, cut).join('').trimEnd() + '…';
-        }
-
-        // opts: { baseFont, steps: [{len, font}], maxChars }
+        // Not: Kısaltma (… / ellipsis) İSTENMİYOR. Metinler kısaltılmadan satıra kırılır.
+        // opts: { baseFont, steps: [{len, font}] }
         function fitTextForDesign(str, opts) {
             const raw = (str ?? '').toString().trim();
             const len = graphemeLength(raw);
@@ -945,9 +937,7 @@
             for (const step of steps) {
                 if (len >= step.len) fontSize = step.font;
             }
-            const maxChars = opts?.maxChars ?? 60;
-            const clipped = truncateWithEllipsis(raw, maxChars);
-            return { text: escapeHtml(clipped), fontSize };
+            return { text: escapeHtml(raw), fontSize };
         }
 
         // Kulüp Listesi (çalışan liste)
@@ -2539,23 +2529,19 @@
                                     // Karakter analizi: uzun metinlerde punto küçült + kısalt
                                     const clubFit = fitTextForDesign(event.clubName, {
                                         baseFont: 12,
-                                        steps: [{ len: 28, font: 11 }, { len: 40, font: 10 }, { len: 52, font: 9 }],
-                                        maxChars: 64
+                                        steps: [{ len: 28, font: 11 }, { len: 40, font: 10 }, { len: 52, font: 9 }]
                                     });
                                     const titleFit = fitTextForDesign(event.eventTitle, {
                                         baseFont: 12,
-                                        steps: [{ len: 26, font: 11 }, { len: 38, font: 10 }, { len: 50, font: 9 }],
-                                        maxChars: 70
+                                        steps: [{ len: 26, font: 11 }, { len: 38, font: 10 }, { len: 50, font: 9 }]
                                     });
                                     const locationFit = fitTextForDesign(locationText, {
                                         baseFont: 11,
-                                        steps: [{ len: 34, font: 10 }, { len: 48, font: 9 }],
-                                        maxChars: 80
+                                        steps: [{ len: 34, font: 10 }, { len: 48, font: 9 }]
                                     });
                                     const campusFit = fitTextForDesign(event.campus || '', {
                                         baseFont: 10,
-                                        steps: [{ len: 30, font: 9 }, { len: 44, font: 8 }],
-                                        maxChars: 60
+                                        steps: [{ len: 30, font: 9 }, { len: 44, font: 8 }]
                                     });
                                     
                                     let logoHTML = '🎯';
@@ -2603,11 +2589,11 @@
                                                 ${logoHTML}
                                             </div>
                                             <div style="flex: 1; min-width: 0;">
-                                                <div style="color: white; font-size: ${clubFit.fontSize}px; font-weight: 700; margin-bottom: 4px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${clubFit.text}</div>
-                                                <div style="color: #ffd700; font-size: ${titleFit.fontSize}px; font-weight: 700; margin-bottom: 6px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${titleFit.text}</div>
+                                                <div style="color: white; font-size: ${clubFit.fontSize}px; font-weight: 700; margin-bottom: 4px; line-height: 1.15; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${clubFit.text}</div>
+                                                <div style="color: #ffd700; font-size: ${titleFit.fontSize}px; font-weight: 700; margin-bottom: 6px; line-height: 1.15; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${titleFit.text}</div>
                                                 <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${escapeHtml(event.time)}</div>
-                                                <div style="color: ${locationColor}; font-size: ${locationFit.fontSize}px; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${locationIcon} ${locationFit.text}</div>
-                                                ${event.campus ? `<div style="color: white; font-size: ${campusFit.fontSize}px; margin-top: 2px; opacity: 0.9; line-height: 1.15; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">${campusFit.text}</div>` : ''}
+                                                <div style="color: ${locationColor}; font-size: ${locationFit.fontSize}px; line-height: 1.15; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${locationIcon} ${locationFit.text}</div>
+                                                ${event.campus ? `<div style="color: white; font-size: ${campusFit.fontSize}px; margin-top: 2px; opacity: 0.9; line-height: 1.15; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${campusFit.text}</div>` : ''}
                                             </div>
                                         </div>
                                     `;
