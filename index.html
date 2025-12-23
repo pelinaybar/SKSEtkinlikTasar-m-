@@ -1021,6 +1021,125 @@
         const dayDateISO = {};
         let draggedElement = null;
 
+        // Etkinlik verisini yenilemede kaybetmemek için localStorage'a otomatik kaydet/geri yükle
+        const EVENTS_STORAGE_KEY = 'sks_events_state_v1';
+        let _eventsSaveTimer = null;
+
+        function getWeekStateFromInputs() {
+            const startDate = (document.getElementById('startDate')?.value || '').trim();
+            const endDate = (document.getElementById('endDate')?.value || '').trim();
+            return { startDate, endDate };
+        }
+
+        function setWeekStateToInputs(state) {
+            try {
+                if (state?.startDate) document.getElementById('startDate').value = state.startDate;
+                if (state?.endDate) document.getElementById('endDate').value = state.endDate;
+            } catch (_) {}
+        }
+
+        function serializeEventsForStorage(src) {
+            const out = {};
+            Object.keys(src || {}).forEach((day) => {
+                const d = src[day];
+                if (!d || !Array.isArray(d.events)) return;
+                out[day] = {
+                    dayName: d.dayName || day,
+                    date: d.date || '',
+                    isoDate: d.isoDate || '',
+                    events: d.events.map((ev) => {
+                        const clubName = canonicalizeClubName(ev?.clubName) || (ev?.clubName || '');
+                        let clubIcon = ev?.clubIcon || '';
+                        // base64 şişirmesin: tekrar üretiriz
+                        if (typeof clubIcon === 'string' && clubIcon.startsWith('data:')) clubIcon = '';
+                        return {
+                            clubName,
+                            clubIcon,
+                            eventTitle: ev?.eventTitle || '',
+                            time: ev?.time || '',
+                            location: ev?.location || '',
+                            campus: ev?.campus || '',
+                            isOnline: !!ev?.isOnline
+                        };
+                    })
+                };
+            });
+            return out;
+        }
+
+        function hydrateEventsAfterLoad() {
+            try {
+                Object.keys(events || {}).forEach((day) => {
+                    const d = events[day];
+                    if (!d || !Array.isArray(d.events)) return;
+                    // isoDate varsa gün bazlı hafızaya da yaz
+                    if (d.isoDate) dayDateISO[day] = d.isoDate;
+                    d.events.forEach((ev) => {
+                        if (!ev) return;
+                        const canon = canonicalizeClubName(ev.clubName) || ev.clubName;
+                        if (canon) ev.clubName = canon;
+                        if (!ev.clubIcon) {
+                            const src = getLogoSource(ev.clubName);
+                            if (src) ev.clubIcon = src;
+                        }
+                    });
+                });
+            } catch (_) {}
+        }
+
+        function saveEventsStateNow() {
+            try {
+                const payload = {
+                    version: 1,
+                    savedAt: new Date().toISOString(),
+                    week: getWeekStateFromInputs(),
+                    dayDateISO: { ...dayDateISO },
+                    events: serializeEventsForStorage(events)
+                };
+                localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {
+                console.warn('Etkinlikler kaydedilemedi:', e);
+            }
+        }
+
+        function scheduleSaveEventsState() {
+            clearTimeout(_eventsSaveTimer);
+            _eventsSaveTimer = setTimeout(saveEventsStateNow, 300);
+        }
+
+        function loadEventsStateFromStorage() {
+            try {
+                const raw = localStorage.getItem(EVENTS_STORAGE_KEY);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed !== 'object') return false;
+                if (parsed.week) setWeekStateToInputs(parsed.week);
+                if (parsed.dayDateISO && typeof parsed.dayDateISO === 'object') {
+                    Object.keys(parsed.dayDateISO).forEach((k) => {
+                        dayDateISO[k] = parsed.dayDateISO[k];
+                    });
+                }
+                if (parsed.events && typeof parsed.events === 'object') {
+                    events = parsed.events;
+                }
+                hydrateEventsAfterLoad();
+                return true;
+            } catch (e) {
+                console.warn('Etkinlikler yüklenemedi:', e);
+                return false;
+            }
+        }
+
+        function setupEventsAutoSave() {
+            const startEl = document.getElementById('startDate');
+            const endEl = document.getElementById('endDate');
+            [startEl, endEl].forEach((el) => {
+                if (!el) return;
+                el.addEventListener('input', () => scheduleSaveEventsState());
+                el.addEventListener('change', () => scheduleSaveEventsState());
+            });
+        }
+
         // Debug logları (production'da kapalı)
         const DEBUG = false;
         function dlog(...args) { if (DEBUG) console.log(...args); }
@@ -1228,6 +1347,7 @@
             renderEvents();
             // Aynı güne ardışık etkinlik eklerken tarih/gün sıfırlanmasın
             clearForm({ keepDate: true });
+            scheduleSaveEventsState();
             
             // Başarı mesajı
             const successMsg = document.createElement('div');
@@ -1246,6 +1366,7 @@
                     delete events[day];
                 }
                 renderEvents();
+                scheduleSaveEventsState();
             }
         }
 
@@ -2268,6 +2389,7 @@
                             events[day].events[index].campus = newValue;
                         }
                         renderEvents();
+                        scheduleSaveEventsState();
                     } else {
                         element.classList.remove('editing');
                         renderEvents();
@@ -2295,6 +2417,23 @@
                 
                 card.addEventListener('dragend', () => {
                     card.classList.remove('dragging');
+                    // DOM sıralamasını events verisine yaz
+                    try {
+                        const day = card.dataset.day;
+                        const grid = card.parentElement;
+                        if (day && grid && events[day] && Array.isArray(events[day].events)) {
+                            const current = [...events[day].events];
+                            const order = Array.from(grid.querySelectorAll('.event-card'))
+                                .map(el => parseInt(el.dataset.index, 10))
+                                .filter(n => Number.isFinite(n));
+                            if (order.length === current.length) {
+                                events[day].events = order.map(i => current[i]).filter(Boolean);
+                                // indeksleri güncellemek için yeniden çiz
+                                renderEvents();
+                                scheduleSaveEventsState();
+                            }
+                        }
+                    } catch (_) {}
                     draggedElement = null;
                 });
                 
@@ -3452,10 +3591,18 @@
             initClubList();
             setupClubAutoSelect();
             initTimeSelector();
+            setupEventsAutoSave();
+
+            // Etkinlikleri localStorage'dan geri yükle (varsa)
+            const restored = loadEventsStateFromStorage();
 
             // Yükleme sonrası mevcut etkinlikler varsa logoları güncelle ve listeyi yenile
             refreshEventLogosFromDatabase();
             try { renderEvents(); } catch (_) {}
+            if (restored) {
+                // Eğer gün seçiliyse, o gün için kaydedilmiş tarihi otomatik doldur
+                try { suggestDateForDay(); } catch (_) {}
+            }
         };
     </script>
 </body>
