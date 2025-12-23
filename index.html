@@ -1,0 +1,3168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üsküdar Üniversitesi - Haftalık Etkinlik Programı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a5f5f 0%, #2a7a7a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #1a5f5f 0%, #2a7a7a 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .header-section p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .form-section {
+            padding: 25px 30px;
+            background: white;
+        }
+
+        .form-section h2 {
+            color: #1a5f5f;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #1a5f5f;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #1a5f5f;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1a5f5f;
+            box-shadow: 0 0 0 3px rgba(26, 95, 95, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .form-group small {
+            display: block;
+            color: #666;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .logo-preview {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .logo-preview img {
+            max-width: 50px;
+            max-height: 50px;
+            object-fit: contain;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #1a5f5f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a7a7a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 95, 95, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .events-list {
+            margin-top: 30px;
+        }
+
+        /* 7 Günlük Renk Temaları - Tasarıma Birebir Uyumlu */
+        .day-section.pazartesi {
+            --day-color: #e74c3c;
+            --day-light: #fadbd8;
+        }
+        .day-section.sali {
+            --day-color: #f39c12;
+            --day-light: #fdebd0;
+        }
+        .day-section.carsamba {
+            --day-color: #f1c40f;
+            --day-light: #fef9e7;
+        }
+        .day-section.persembe {
+            --day-color: #2ecc71;
+            --day-light: #d5f4e6;
+        }
+        .day-section.cuma {
+            --day-color: #3498db;
+            --day-light: #d6eaf8;
+        }
+        .day-section.cumartesi {
+            --day-color: #9b59b6;
+            --day-light: #ebdef0;
+        }
+        .day-section.pazar {
+            --day-color: #e67e22;
+            --day-light: #fae5d3;
+        }
+
+        .day-section {
+            margin-bottom: 25px;
+            background: var(--day-light);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 5px solid var(--day-color);
+        }
+
+        .day-header {
+            background-color: var(--day-color);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .day-header:hover {
+            opacity: 0.95;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        /* Tasarıma Birebir Uyumlu Event Kartları - Yatay Düzen (İkon Solda, Metin Sağda) */
+        .event-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+            transition: all 0.3s;
+            cursor: move;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .event-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            border-color: var(--day-color);
+        }
+
+        .event-card.dragging {
+            opacity: 0.5;
+        }
+
+        .event-card .club-icon {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        
+        .event-card .club-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .event-card .event-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .event-card .club-name {
+            font-size: 10px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .event-card .event-title {
+            font-size: 13px;
+            color: #1a5f5f;
+            font-weight: bold;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .event-card .event-time,
+        .event-card .event-location {
+            font-size: 11px;
+            margin-bottom: 3px;
+            cursor: text;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        .event-card .event-time {
+            color: #333;
+        }
+
+        .event-card .event-location {
+            color: #4a90e2;
+        }
+
+        .event-card .event-location.online {
+            color: #ff6b6b;
+        }
+
+        .event-card .event-time:hover,
+        .event-card .event-location:hover {
+            background: #f0f0f0;
+        }
+
+        .event-card .delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .event-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .event-card input[type="text"] {
+            width: 100%;
+            border: 1px solid #ffc107;
+            padding: 4px;
+            border-radius: 3px;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>ÜSKÜDAR ÜNİVERSİTESİ</h1>
+            <p>SAĞLIK, KÜLTÜR VE SPOR DAİRE BAŞKANLIĞI</p>
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.9;">Haftalık Etkinlik Programı Oluşturucu</p>
+        </div>
+
+        <div class="form-section">
+            <h2>Etkinlik Ekle</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tarih Aralığı - Başlangıç</label>
+                    <input type="text" id="startDate" placeholder="örn: 22 ARALIK" value="22 ARALIK">
+                </div>
+                <div class="form-group">
+                    <label>Tarih Aralığı - Bitiş</label>
+                    <input type="text" id="endDate" placeholder="örn: 28 ARALIK" value="28 ARALIK">
+                </div>
+                <div class="form-group">
+                    <label>Gün</label>
+                    <select id="daySelect" onchange="suggestDateForDay()">
+                        <option value="">Seçin...</option>
+                        <option value="Pazartesi">Pazartesi</option>
+                        <option value="Salı">Salı</option>
+                        <option value="Çarşamba">Çarşamba</option>
+                        <option value="Perşembe">Perşembe</option>
+                        <option value="Cuma">Cuma</option>
+                        <option value="Cumartesi">Cumartesi</option>
+                        <option value="Pazar">Pazar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tarih</label>
+                    <input type="date" id="fullDate" onchange="formatSelectedDate()">
+                </div>
+                <div class="form-group">
+                    <label>Tarih (Formatlı)</label>
+                    <input type="text" id="fullDateFormatted" placeholder="Otomatik doldurulacak" readonly>
+                </div>
+                <div class="form-group full-width">
+                    <label>Kulüp</label>
+                    <input type="text" id="clubName" placeholder="Kulüp seçin veya yazın..." list="clubList" autocomplete="off" oninput="filterClubList()">
+                    <datalist id="clubList"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Logo Önizleme</label>
+                    <div class="logo-preview" id="logoPreview">
+                        <span style="font-size: 28px;">🎯</span>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Etkinlik Başlığı</label>
+                    <input type="text" id="eventTitle" placeholder="örn: Yeryüzüne Dokun">
+                </div>
+                <div class="form-group">
+                    <label>Saat</label>
+                    <select id="eventTime">
+                        <option value="">Seçin...</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Konum / Salon</label>
+                    <input type="text" id="eventLocation" placeholder="örn: Fuat Sezgin Salonu">
+                </div>
+                <div class="form-group">
+                    <label>Yerleşke</label>
+                    <select id="campusSelect">
+                        <option value="">Seçin...</option>
+                        <option value="Merkez Yerleşkesi">Merkez Yerleşkesi</option>
+                        <option value="Güney Yerleşkesi">Güney Yerleşkesi</option>
+                        <option value="Sağlık Yerleşkesi">Sağlık Yerleşkesi</option>
+                        <option value="Çarşı Yerleşkesi">Çarşı Yerleşkesi</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isOnline">
+                        <label for="isOnline">Çevrimiçi Etkinlik (ZOOM)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="addEvent()">➕ Etkinlik Ekle</button>
+                <button class="btn btn-secondary" onclick="clearForm()">🔄 Formu Temizle</button>
+            </div>
+
+            <div class="events-list" id="eventsList"></div>
+            
+            <div class="button-group" style="margin-top: 30px; justify-content: center;">
+                <button class="btn btn-success" onclick="convertToDesign()" style="background: #28a745; padding: 12px 30px; font-size: 16px;">🎨 Tasarıma Dönüştür</button>
+                <button class="btn btn-primary" onclick="downloadDesign()" id="downloadBtn" style="display: none; background: #1a5f5f;">💾 Tasarımı İndir</button>
+            </div>
+            
+            <!-- Logo Yönetimi -->
+            <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #1a5f5f;">
+                <h3 style="color: #1a5f5f; margin-bottom: 10px; font-size: 16px;">📁 Logo Yönetimi</h3>
+                <p style="color: #333; font-size: 13px; margin-bottom: 10px;">
+                    Yeni logo eklemek veya mevcut logoları düzenlemek için:
+                </p>
+                <button class="btn btn-primary" onclick="openLogoManager()" style="background: #1a5f5f; padding: 10px 20px; font-size: 14px; margin-top: 10px;">⚙️ Logo Yönetim Paneli</button>
+            </div>
+            
+            <!-- Logo Yönetim Modal -->
+            <div id="logoManagerModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+                <div style="background: white; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+                    <div style="padding: 20px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; background: #1a5f5f; color: white; border-radius: 12px 12px 0 0;">
+                        <h2 style="margin: 0; color: white; font-size: 20px;">🎨 Logo Yönetim Paneli</h2>
+                        <button onclick="closeLogoManager()" style="background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px;">×</button>
+                    </div>
+                    <div style="padding: 20px;">
+                        <!-- Logo Boyut Bilgisi -->
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                            <h3 style="color: #856404; margin: 0 0 10px 0; font-size: 16px;">📐 Logo Boyut Önerileri</h3>
+                            <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px;">
+                                <li><strong>Önerilen Boyut:</strong> 300x300 piksel (1:1 kare format)</li>
+                                <li><strong>Minimum Boyut:</strong> 200x200 piksel</li>
+                                <li><strong>Maksimum Boyut:</strong> 512x512 piksel</li>
+                                <li><strong>Format:</strong> PNG (şeffaf arka plan önerilir)</li>
+                                <li><strong>Dosya Boyutu:</strong> Maksimum 500 KB (optimize edilmiş)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Kulüp Seçin</span>
+                                <button onclick="showAddClubModal()" style="background: #17a2b8; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">+ Yeni Kulüp Ekle</button>
+                            </label>
+                            <select id="logoManagerClubSelect" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;">
+                                <option value="">Kulüp seçin...</option>
+                            </select>
+                            <div style="margin-top: 8px; display: flex; gap: 5px;">
+                                <button onclick="editSelectedClub()" style="flex: 1; background: #ffc107; color: #333; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 12px;">✏️ Düzenle</button>
+                                <button onclick="deleteSelectedClub()" style="flex: 1; background: #dc3545; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 12px;">🗑️ Sil</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Yeni Kulüp Ekleme/Düzenleme Modal -->
+                        <div id="addClubModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center; padding: 20px;">
+                            <div style="background: white; border-radius: 12px; max-width: 500px; width: 100%; position: relative;">
+                                <div style="padding: 20px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; background: #1a5f5f; color: white; border-radius: 12px 12px 0 0;">
+                                    <h2 style="margin: 0; color: white; font-size: 18px;" id="addClubModalTitle">➕ Yeni Kulüp Ekle</h2>
+                                    <button onclick="closeAddClubModal()" style="background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px;">×</button>
+                                </div>
+                                <div style="padding: 20px;">
+                                    <div class="form-group">
+                                        <label>Kulüp Adı</label>
+                                        <input type="text" id="newClubName" placeholder="örn: Yeni Kulüp Adı" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;">
+                                    </div>
+                                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                        <button onclick="saveNewClub()" style="flex: 1; background: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px;">💾 Kaydet</button>
+                                        <button onclick="closeAddClubModal()" style="flex: 1; background: #6c757d; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px;">İptal</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dosya Yükleme Alanı -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Logo Dosyası Yükle</label>
+                            <div id="logoUploadArea" style="border: 3px dashed #1a5f5f; border-radius: 8px; padding: 30px; text-align: center; background: #f8f9fa; cursor: pointer; transition: all 0.3s;" 
+                                 ondrop="handleLogoDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('logoFileInput').click()">
+                                <input type="file" id="logoFileInput" accept="image/png,image/jpeg,image/jpg" style="display: none;" onchange="handleLogoFileSelect(event)">
+                                <div id="uploadAreaContent">
+                                    <div style="font-size: 48px; margin-bottom: 10px;">📤</div>
+                                    <div style="color: #1a5f5f; font-weight: bold; margin-bottom: 5px;">Logo Dosyasını Sürükleyip Bırakın</div>
+                                    <div style="color: #666; font-size: 13px;">veya tıklayarak seçin</div>
+                                    <div style="color: #999; font-size: 12px; margin-top: 8px;">PNG, JPG formatları desteklenir</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Toplu Logo İçe Aktarım (Klasör) -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Toplu Logo İçe Aktar (Klasör Seç)</label>
+                            <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+                                <input type="file" id="logoFolderInput" style="display:none;" webkitdirectory directory multiple accept="image/png,image/jpeg,image/jpg" onchange="handleLogoFolderSelect(event)">
+                                <button onclick="document.getElementById('logoFolderInput').click()" style="background:#1a5f5f; color:white; border:none; padding:10px 14px; border-radius:6px; cursor:pointer; font-size:13px;">
+                                    📂 Klasör Seç (Toplu)
+                                </button>
+                                <span id="bulkImportStatus" style="color:#666; font-size:12px;"></span>
+                            </div>
+                            <small style="color:#666; display:block; margin-top:6px; line-height:1.5;">
+                                <strong>Neden gerekli?</strong> Chrome, <code>file://</code> altında PNG’leri canvas’a çizdirmediği için indirme boş çıkabiliyor.
+                                Klasörden içe aktarınca logolar <strong>base64</strong> olarak kaydedilir ve “Tasarımı İndir” stabil çalışır.
+                            </small>
+                        </div>
+
+                        <!-- Header Logoları (ÜÜ / SKS) -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Header Logoları (ÜÜ / SKS)</label>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div style="border:1px solid #e0e0e0; border-radius: 8px; padding: 12px;">
+                                    <div style="font-weight:600; color:#1a5f5f; margin-bottom:8px;">ÜÜ (Sol Üst)</div>
+                                    <input type="file" id="headerUULogoInput" accept="image/png,image/jpeg,image/jpg" onchange="handleHeaderLogoSelect('uu', event)" style="width:100%; font-size:12px;">
+                                    <div id="headerUULogoPreview" style="margin-top:10px; width: 110px; height: 110px; border-radius: 50%; overflow:hidden; background:#f8f9fa; border:2px dashed #e0e0e0; display:flex; align-items:center; justify-content:center;">
+                                        <span style="color:#999; font-size:12px;">ÜÜ</span>
+                                    </div>
+                                </div>
+                                <div style="border:1px solid #e0e0e0; border-radius: 8px; padding: 12px;">
+                                    <div style="font-weight:600; color:#1a5f5f; margin-bottom:8px;">SKS (Sağ Üst)</div>
+                                    <input type="file" id="headerSKSLogoInput" accept="image/png,image/jpeg,image/jpg" onchange="handleHeaderLogoSelect('sks', event)" style="width:100%; font-size:12px;">
+                                    <div id="headerSKSLogoPreview" style="margin-top:10px; width: 110px; height: 110px; border-radius: 50%; overflow:hidden; background:#f8f9fa; border:2px dashed #e0e0e0; display:flex; align-items:center; justify-content:center;">
+                                        <span style="color:#999; font-size:12px;">SKS</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:12px;">
+                                <button onclick="clearHeaderLogos()" style="background:#dc3545; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12px;">
+                                    🗑️ Header Logolarını Temizle
+                                </button>
+                                <span style="color:#666; font-size:12px; align-self:center;">Bu logolar base64 olarak kaydedilir ve indirmede sorunsuz görünür.</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Dosya Adı Girişi -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Logo Dosya Adı (logos/ klasöründen)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="logoManagerFileName" placeholder="örn: genc-yeryuzu-doktorlari.png" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;">
+                                <button onclick="generateFileNameFromClub()" style="padding: 10px 15px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; font-size: 13px;">📝 Otomatik İsim</button>
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                <strong>Kullanım:</strong> Logos klasörüne dosyayı kopyalayın, sonra dosya adını buraya yazın.<br>
+                                <strong>Örnek:</strong> logos/milli-miras.png → "milli-miras.png" yazın
+                            </small>
+                        </div>
+                        
+                        <!-- Logo Bilgileri -->
+                        <div id="logoInfo" style="display: none; margin-top: 15px; padding: 12px; background: #e7f3ff; border-radius: 6px; border-left: 4px solid #1a5f5f;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                                <div><strong>Boyut:</strong> <span id="logoSizeInfo">-</span></div>
+                                <div><strong>Dosya Boyutu:</strong> <span id="logoFileSizeInfo">-</span></div>
+                                <div><strong>Format:</strong> <span id="logoFormatInfo">-</span></div>
+                                <div><strong>Oran:</strong> <span id="logoRatioInfo">-</span></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Logo Önizleme -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Logo Önizleme</label>
+                            <div id="logoManagerPreview" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 6px; min-height: 150px; display: flex; align-items: center; justify-content: center; border: 2px dashed #e0e0e0;">
+                                <span style="color: #999;">Logo önizlemesi burada görünecek</span>
+                            </div>
+                        </div>
+                        <!-- Kullanım Talimatları -->
+                        <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #1a5f5f;">
+                            <h4 style="color: #1a5f5f; margin: 0 0 10px 0; font-size: 14px;">📖 Nasıl Kullanılır?</h4>
+                            <ol style="margin: 0; padding-left: 20px; color: #333; font-size: 12px; line-height: 1.8;">
+                                <li><strong>Kulüp seçin</strong> - Dropdown'dan kulübü seçin</li>
+                                <li><strong>Logo yükleyin</strong> - Dosyayı sürükleyip bırakın veya tıklayarak seçin</li>
+                                <li><strong>Dosyayı logos/ klasörüne kopyalayın</strong> - Seçtiğiniz dosyayı <code>logos/</code> klasörüne kopyalayın</li>
+                                <li><strong>Dosya adını kontrol edin</strong> - Otomatik oluşturulan ismi kontrol edin veya düzenleyin</li>
+                                <li><strong>Kaydet</strong> - Eşleştirmeyi kaydedin</li>
+                            </ol>
+                            <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 4px; font-size: 11px; color: #666;">
+                                <strong>💡 İpucu:</strong> Dosya adında Türkçe karakter ve boşluk kullanmayın. Sistem otomatik olarak düzenler.
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="saveLogoMapping()" style="flex: 1; background: #28a745;">💾 Kaydet</button>
+                            <button class="btn btn-info" onclick="exportLogosToJSON()" style="flex: 1; background: #17a2b8; color: white;">📥 JSON'a Aktar (GitHub için)</button>
+                            <button class="btn btn-secondary" onclick="closeLogoManager()" style="flex: 1;">İptal</button>
+                        </div>
+                        
+                        <!-- Export Bilgisi -->
+                        <div style="margin-top: 15px; padding: 12px; background: #d1ecf1; border-radius: 6px; border-left: 4px solid #17a2b8;">
+                            <h4 style="color: #0c5460; margin: 0 0 8px 0; font-size: 13px;">📦 GitHub için Export</h4>
+                            <p style="color: #0c5460; font-size: 11px; margin: 0; line-height: 1.6;">
+                                <strong>Önemli:</strong> Logoları GitHub'a yüklemek için "JSON'a Aktar" butonuna tıklayın. 
+                                İndirilen <code>logos.json</code> dosyasını GitHub repository'nize yükleyin. 
+                                Böylece herkes aynı logoları görebilir.
+                            </p>
+                        </div>
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                            <h3 style="color: #1a5f5f; margin-bottom: 15px; font-size: 16px;">📋 Mevcut Logo Eşleştirmeleri</h3>
+                            <div id="logoMappingsList" style="max-height: 300px; overflow-y: auto;">
+                                <!-- Logo eşleştirmeleri buraya eklenecek -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasarım Önizleme -->
+            <div id="designPreview" style="display: none; margin-top: 30px; padding: 40px 20px; background: #f8f9fa; border-radius: 8px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Kulüp Listesi (LocalStorage'dan yüklenecek)
+        let clubNames = [
+            'Genç Yeryüzü Doktorları Kulübü', 'Geleceğin Liderleri Kulübü', 'Üsküdar Üniversitesi Tarih Kulübü',
+            'Perfüzyon Kulübü', 'Tarih ve Kültür Kulübü', 'Intercultural Kulübü',
+            'Sessizliği Boz Kulübü', 'STEM Projects Kulübü', 'İlk ve Acil Yardım Kulübü',
+            'Yeşilay Kulübü', 'Sosyoloji Kulübü', 'Üsküdar Üniversitesi Cansağlığı Kulübü',
+            'Üsküdar Çeviri Kulübü', 'Genç Gönüllüler Kulübü', 'Teknoloji ve İnovasyon Kulübü',
+            'Sağlık Yönetimi Kulübü', 'Senaryo Bazlı İSG Uygulamaları Kulübü', 'Fizyoterapi Kulübü',
+            'Lösemili Çocuklara Fayda Kulübü', 'Gazetecilik Kulübü', 'Çağın Vicdanı Kulübü',
+            'Hemşirelik Kulübü', 'Dil ve Konuşma Terapisi Kulübü', 'Sürdürülebilir Kalkınma Kulübü',
+            'Üsküdar Üniversitesi Spor Kulübü', 'Adli Bilimler Ve Ceza Adaleti Kulübü', 'İyiliğin Geleceği Kulübü',
+            'Ombudsman Kulübü', 'ÜÇEV', 'Milli Miras Kulübü',
+            'Yetenek Farkındalığı Kulübü', 'Genç Yeşilay Kulübü', 'Kalite Kulübü',
+            'Tiyatro Kulübü', 'Gençlik Kulübü', 'Tut Elimi Kulübü',
+            'Animasyon Kulübü', 'Tasarım Kulübü', 'ENLK Kulübü',
+            'Diyetüsk Kulübü', 'Çocuk Gelişimi Kulübü', 'Sinema Kulübü',
+            'Üsküdans Kulübü', 'Müzik Kulübü', 'EkoVizyon Kulübü',
+            'Yeni Medya Kulübü', 'IEEE Kulübü', 'Tıp Öğrencileri Birliği',
+            'Türk Kızılay Genç', 'Proje Geliştirme ve Gençlik Kulübü', 'STEM Kulübü',
+            'Meclis Kürsüsü Kulübü', 'ÜSKÜRAT', 'Pozitif Psikoloji Kulübü',
+            'Uluslararası Diplomasi Kulübü', 'Genç İletişimciler Kulübü', 'ENSA',
+            'Felsefe Kulübü', 'Diş Protez Kulübü', 'Moleküler Biyoloji ve Genetik Kulübü',
+            'Diş Hekimliği Öğrenci Birliği', 'Türkçe Konuşma Kulübü', 'Kültürel Keşif Kulübü',
+            'Elektronörofizyoloji Kulübü', 'Fikir ve Aksiyon Kulübü', 'DKT Kulübü',
+            'BİKULÜP', 'Laboratuvar Teknikleri Kulübü', 'TeknoFest Kulübü',
+            'Ergoterapi Kulübü', 'Eşit Adımlar', 'Odyoloji Kulübü',
+            'Gıda Kulübü', 'Bilişim Kulübü', 'Podoloji Kulübü',
+            'Genç Tıbbiyeliler Kulübü', 'BIOENGTEC', 'Okçuluk Kulübü',
+            'Anestezi Kulübü', 'Sosyal Hizmet Kulübü', 'AFAD Kulübü',
+            'MUN Kulübü', 'AI and Smart Systems Club', 'Mucizeye İlk Dokunuş Kulübü',
+            'Finansal Okuryazarlık Kulübü', 'İSG Kulübü', 'Nadir Hastalıklar Kulübü',
+            'Fizyoterapi ve Rehabilitasyon Kulübü', 'Genç Tıbbiyeliler Kulübü', 'Üsküdar Üniversitesi'
+        ];
+
+        // Kulüp Logoları Veritabanı - Gerçek dosya isimleriyle eşleştirildi
+        let clubLogoDatabase = {
+            'Genç Yeryüzü Doktorları Kulübü': 'logos/genç yer yüzü doktorları.png',
+            'Geleceğin Liderleri Kulübü': 'logos/geleceğin liderleri.png',
+            'Üsküdar Üniversitesi Tarih Kulübü': 'logos/tarih kulübü.png',
+            'Perfüzyon Kulübü': 'logos/perfüzyon kulübü.png',
+            'Tarih ve Kültür Kulübü': 'logos/tarih ve kültür kulübü.png',
+            'Intercultural Kulübü': 'logos/ıntercultural.png',
+            'Sessizliği Boz Kulübü': 'logos/sessizkliği boz kulübü.png',
+            'STEM Projects Kulübü': 'logos/stem projects.png',
+            'İlk ve Acil Yardım Kulübü': 'logos/ilk ve acil yardım.png',
+            'Yeşilay Kulübü': 'logos/genç yeşilay kulübü.png', // Yeşilay için genç yeşilay kullanıldı
+            'Sosyoloji Kulübü': 'logos/sosyoloji kulübü.png',
+            'Üsküdar Üniversitesi Cansağlığı Kulübü': 'logos/can sağlığı.png',
+            'Üsküdar Çeviri Kulübü': 'logos/çeviri.png',
+            'Genç Gönüllüler Kulübü': 'logos/genç gönüllüler.png',
+            'Teknoloji ve İnovasyon Kulübü': 'logos/teknoloji ve inovasyon kulübü.png',
+            'Sağlık Yönetimi Kulübü': 'logos/sağlık yönetimi kulübü.png',
+            'Senaryo Bazlı İSG Uygulamaları Kulübü': 'logos/senaryo bazlı isg.png',
+            'Fizyoterapi Kulübü': 'logos/fizyoterapi kulübü.png',
+            'Lösemili Çocuklara Fayda Kulübü': 'logos/lösemili çocuklara fayda kulübü.png',
+            'Gazetecilik Kulübü': 'logos/gazetecilik kulübü.png',
+            'Çağın Vicdanı Kulübü': 'logos/çağın vicdanı.png',
+            'Hemşirelik Kulübü': 'logos/hemşirelik kulübü.png',
+            'Dil ve Konuşma Terapisi Kulübü': 'logos/dilvekonuşma.png',
+            'Sürdürülebilir Kalkınma Kulübü': 'logos/sürdürülebilirlik kulübü.png',
+            'Üsküdar Üniversitesi Spor Kulübü': 'logos/spor.png',
+            'Adli Bilimler Ve Ceza Adaleti Kulübü': 'logos/adlibimler kulübü.png',
+            'İyiliğin Geleceği Kulübü': 'logos/iyiliğin geleceği.png',
+            'Ombudsman Kulübü': 'logos/ombusman.png',
+            'ÜÇEV': 'logos/çeviri.png', // ÜÇEV için çeviri logosu kullanıldı
+            'Milli Miras Kulübü': 'logos/milli miras.png',
+            'Yetenek Farkındalığı Kulübü': 'logos/yetenekfarkındalığı.png',
+            'Genç Yeşilay Kulübü': 'logos/genç yeşilay kulübü.png',
+            'Kalite Kulübü': 'logos/Kalite Kulübü Logo.png',
+            'Tiyatro Kulübü': 'logos/tiyatro kulübü.png',
+            'Gençlik Kulübü': 'logos/gençlik kulübü.png',
+            'Tut Elimi Kulübü': 'logos/haydi tut elimi.png',
+            'Animasyon Kulübü': 'logos/animasyon.png',
+            'Tasarım Kulübü': 'logos/tasarım kulübü.png',
+            'ENLK Kulübü': 'logos/enlk.png',
+            'Diyetüsk Kulübü': 'logos/diyetüsk.png',
+            'Çocuk Gelişimi Kulübü': 'logos/çocuk gelişimi kulübü.png',
+            'Sinema Kulübü': 'logos/sinama.png',
+            'Üsküdans Kulübü': 'logos/dans kulübü.png',
+            'Müzik Kulübü': 'logos/müzik kulübü.png',
+            'EkoVizyon Kulübü': 'logos/eko vizyon.png',
+            'Yeni Medya Kulübü': 'logos/yeni medya kulübü.png',
+            'IEEE Kulübü': 'logos/ıeee.png',
+            'Tıp Öğrencileri Birliği': 'logos/tıp öğrencileri birliği.png',
+            'Türk Kızılay Genç': 'logos/kızılay.png',
+            'Proje Geliştirme ve Gençlik Kulübü': 'logos/proje geliştirme ve gençlik kulübü.png',
+            'STEM Kulübü': 'logos/stem projects.png', // STEM için stem projects kullanıldı
+            'Meclis Kürsüsü Kulübü': 'logos/meclis kulübü.png',
+            'ÜSKÜRAT': 'logos/bikutu.png', // ÜSKÜRAT için bikutu kullanıldı
+            'Pozitif Psikoloji Kulübü': 'logos/pozitif psikoloji kulübü.png',
+            'Uluslararası Diplomasi Kulübü': 'logos/uluslararası diplomasi kulübü.png',
+            'Genç İletişimciler Kulübü': 'logos/genç iletişimciler.png',
+            'ENSA': 'logos/ensa.png',
+            'Felsefe Kulübü': 'logos/felsefe kulübü.png',
+            'Diş Protez Kulübü': 'logos/diş protez.png',
+            'Moleküler Biyoloji ve Genetik Kulübü': 'logos/molekülerbiyoloji.png',
+            'Diş Hekimliği Öğrenci Birliği': 'logos/diş hekimliği öğrencileri birliği.png',
+            'Türkçe Konuşma Kulübü': 'logos/türkçe konuşma kulübü.png',
+            'Kültürel Keşif Kulübü': 'logos/kültürel keşlif.png',
+            'Elektronörofizyoloji Kulübü': 'logos/elektronörofizyoloji kulübü.png',
+            'Fikir ve Aksiyon Kulübü': 'logos/fikir ve aksiyon kulübü.png',
+            'DKT Kulübü': 'logos/dilvekonuşma.png', // DKT için dilvekonuşma kullanıldı
+            'BİKULÜP': 'logos/bikutu.png',
+            'Laboratuvar Teknikleri Kulübü': 'logos/laboratuar teknikerliği kulübü.png',
+            'TeknoFest Kulübü': 'logos/teknofest kulübü.png',
+            'Ergoterapi Kulübü': 'logos/ergoterapi.png',
+            'Eşit Adımlar': 'logos/eşit adımlar.png',
+            'Odyoloji Kulübü': 'logos/odyoloji kulübü.png',
+            'Gıda Kulübü': 'logos/gıda kulübü.png',
+            'Bilişim Kulübü': 'logos/bilişim.png',
+            'Podoloji Kulübü': 'logos/podyoloji.png',
+            'Genç Tıbbiyeliler Kulübü': 'logos/genç tıbbiyeliler kulübü.png',
+            'BIOENGTEC': 'logos/bioengtec.png',
+            'Okçuluk Kulübü': 'logos/okçuluk.png',
+            'Anestezi Kulübü': 'logos/Anestezi kulübü_.png',
+            'Sosyal Hizmet Kulübü': 'logos/sosyal hizmetler.png',
+            'AFAD Kulübü': 'logos/afad kulübü.png',
+            'MUN Kulübü': 'logos/mun kulübü.png',
+            'AI and Smart Systems Club': 'logos/artıfıcıal ıntellıgence and smart systems club.png',
+            'Mucizeye İlk Dokunuş Kulübü': 'logos/mucizeye ilk dokunuş.png',
+            'Finansal Okuryazarlık Kulübü': 'logos/finansalokuryazarlık.png',
+            'İSG Kulübü': 'logos/isg kulübü.png',
+            'Nadir Hastalıklar Kulübü': 'logos/nadir hastalıklar kulübü.png',
+            'Fizyoterapi ve Rehabilitasyon Kulübü': 'logos/fizyoterapi ve rehebilitasyon kulübü.png',
+            'Üsküdar Üniversitesi': 'logos/spor.png' // Üniversite için spor logosu kullanıldı
+        };
+        
+        // Base64 Logo Veritabanı (GitHub Pages için)
+        let clubLogoBase64Database = {};
+
+        let events = {};
+        let draggedElement = null;
+
+        // Debug logları (production'da kapalı)
+        const DEBUG = false;
+        function dlog(...args) { if (DEBUG) console.log(...args); }
+        function dwarn(...args) { if (DEBUG) console.warn(...args); }
+
+        // Büyük logo setleri için LocalStorage limiti aşılabiliyor.
+        // Bu yüzden base64 logoları IndexedDB'de saklıyoruz (file:// altında indirme için en stabil yol).
+        const LOGO_IDB = {
+            name: 'tasarimLogoDB',
+            version: 1,
+            stores: {
+                logos: 'logos',     // key: clubName, value: base64
+                meta: 'meta'        // key: string, value: any
+            }
+        };
+
+        function openLogoDB() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('IndexedDB desteklenmiyor'));
+                    return;
+                }
+                const req = indexedDB.open(LOGO_IDB.name, LOGO_IDB.version);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains(LOGO_IDB.stores.logos)) {
+                        db.createObjectStore(LOGO_IDB.stores.logos);
+                    }
+                    if (!db.objectStoreNames.contains(LOGO_IDB.stores.meta)) {
+                        db.createObjectStore(LOGO_IDB.stores.meta);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('IndexedDB açılamadı'));
+            });
+        }
+
+        async function idbSet(storeName, key, value) {
+            const db = await openLogoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                store.put(value, key);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('IndexedDB yazma hatası'));
+            });
+        }
+
+        async function idbGet(storeName, key) {
+            const db = await openLogoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const req = store.get(key);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('IndexedDB okuma hatası'));
+            });
+        }
+
+        async function idbGetAll(storeName) {
+            const db = await openLogoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const req = store.getAllKeys();
+                const out = {};
+                req.onsuccess = async () => {
+                    const keys = req.result || [];
+                    if (!keys.length) { resolve(out); return; }
+                    let pending = keys.length;
+                    keys.forEach((k) => {
+                        const r = store.get(k);
+                        r.onsuccess = () => {
+                            out[k] = r.result;
+                            pending--;
+                            if (pending === 0) resolve(out);
+                        };
+                        r.onerror = () => {
+                            pending--;
+                            if (pending === 0) resolve(out);
+                        };
+                    });
+                };
+                req.onerror = () => reject(req.error || new Error('IndexedDB keys okunamadı'));
+            });
+        }
+
+        async function persistBase64LogosToIDB() {
+            // Kulüp logoları
+            const entries = Object.entries(clubLogoBase64Database || {}).filter(([, v]) => typeof v === 'string' && v.startsWith('data:'));
+            for (const [club, b64] of entries) {
+                await idbSet(LOGO_IDB.stores.logos, club, b64);
+            }
+            // Header logoları
+            const uu = localStorage.getItem('headerUULogoBase64');
+            const sks = localStorage.getItem('headerSKSLogoBase64');
+            if (uu && uu.startsWith('data:')) await idbSet(LOGO_IDB.stores.meta, 'headerUULogoBase64', uu);
+            if (sks && sks.startsWith('data:')) await idbSet(LOGO_IDB.stores.meta, 'headerSKSLogoBase64', sks);
+        }
+
+        async function loadBase64LogosFromIDB() {
+            try {
+                const all = await idbGetAll(LOGO_IDB.stores.logos);
+                Object.keys(all || {}).forEach((club) => {
+                    const v = all[club];
+                    if (typeof v === 'string' && v.startsWith('data:')) {
+                        clubLogoBase64Database[club] = v;
+                    }
+                });
+                const uu = await idbGet(LOGO_IDB.stores.meta, 'headerUULogoBase64').catch(() => null);
+                const sks = await idbGet(LOGO_IDB.stores.meta, 'headerSKSLogoBase64').catch(() => null);
+                if (uu && typeof uu === 'string' && uu.startsWith('data:')) localStorage.setItem('headerUULogoBase64', uu);
+                if (sks && typeof sks === 'string' && sks.startsWith('data:')) localStorage.setItem('headerSKSLogoBase64', sks);
+            } catch (e) {
+                dwarn('IndexedDB logo yükleme hatası:', e);
+            }
+        }
+
+        function addEvent() {
+            console.log('addEvent çağrıldı');
+            
+            const day = document.getElementById('daySelect').value;
+            const fullDate = document.getElementById('fullDateFormatted').value || document.getElementById('fullDate').value;
+            const clubName = document.getElementById('clubName').value.trim();
+            
+            console.log('Form değerleri:', { day, fullDate, clubName });
+            
+            let clubIcon = '🎯';
+            if (clubName) {
+                const logoSrc = getLogoSource(clubName);
+                console.log('Logo kaynağı:', logoSrc ? (logoSrc.substring(0, 30) + '...') : 'bulunamadı', 'kulüp:', clubName);
+                if (logoSrc) {
+                    clubIcon = logoSrc;
+                } else {
+                    console.log('Logo bulunamadı:', clubName);
+                    console.log('clubLogoDatabase kontrol:', clubLogoDatabase[clubName]);
+                    console.log('clubLogoBase64Database kontrol:', clubLogoBase64Database[clubName]);
+                }
+            }
+            
+            const eventTitle = document.getElementById('eventTitle').value.trim();
+            const eventTime = document.getElementById('eventTime').value;
+            const campus = document.getElementById('campusSelect').value;
+            const eventLocation = document.getElementById('eventLocation').value.trim();
+            const isOnline = document.getElementById('isOnline').checked;
+
+            // Validasyon mesajları
+            if (!day) {
+                alert('❌ Lütfen gün seçin!');
+                return;
+            }
+            if (!fullDate) {
+                alert('❌ Lütfen tarih girin!');
+                return;
+            }
+            if (!clubName) {
+                alert('❌ Lütfen kulüp adı girin!');
+                return;
+            }
+            if (!eventTitle) {
+                alert('❌ Lütfen etkinlik başlığı girin!');
+                return;
+            }
+            if (!eventTime) {
+                alert('❌ Lütfen saat seçin!');
+                return;
+            }
+            if (!eventLocation) {
+                alert('❌ Lütfen konum girin!');
+                return;
+            }
+
+            if (!events[day]) {
+                events[day] = {
+                    dayName: day,
+                    date: fullDate,
+                    events: []
+                };
+            }
+
+            events[day].events.push({
+                clubName: clubName,
+                clubIcon: clubIcon,
+                eventTitle: eventTitle,
+                time: eventTime,
+                location: eventLocation,
+                campus: campus || '',
+                isOnline: isOnline
+            });
+
+            console.log('Etkinlik eklendi:', {
+                day,
+                clubName,
+                clubIcon: clubIcon.substring ? (clubIcon.substring(0, 50) + '...') : clubIcon,
+                eventTitle
+            });
+
+            renderEvents();
+            clearForm();
+            
+            // Başarı mesajı
+            const successMsg = document.createElement('div');
+            successMsg.textContent = '✅ Etkinlik eklendi!';
+            successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px 20px; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+            document.body.appendChild(successMsg);
+            setTimeout(() => {
+                successMsg.remove();
+            }, 2000);
+        }
+
+        function deleteEvent(day, index) {
+            if (confirm('Bu etkinliği silmek istediğinize emin misiniz?')) {
+                events[day].events.splice(index, 1);
+                if (events[day].events.length === 0) {
+                    delete events[day];
+                }
+                renderEvents();
+            }
+        }
+
+        function formatSelectedDate() {
+            const dateInput = document.getElementById('fullDate');
+            const formattedInput = document.getElementById('fullDateFormatted');
+            
+            if (dateInput.value) {
+                const date = new Date(dateInput.value);
+                const day = date.getDate();
+                const monthNames = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 
+                                   'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                
+                formattedInput.value = `${day} ${month} ${year}`;
+            } else {
+                formattedInput.value = '';
+            }
+        }
+
+        function suggestDateForDay() {
+            const daySelect = document.getElementById('daySelect');
+            const dateInput = document.getElementById('fullDate');
+            const startDateInput = document.getElementById('startDate');
+            
+            if (!daySelect.value) return;
+            
+            const startDateText = startDateInput.value;
+            if (startDateText) {
+                const parts = startDateText.split(' ');
+                if (parts.length >= 2) {
+                    const day = parseInt(parts[0]);
+                    const monthNames = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 
+                                       'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
+                    const monthIndex = monthNames.indexOf(parts[1].toUpperCase());
+                    
+                    if (monthIndex !== -1) {
+                        const currentYear = new Date().getFullYear();
+                        const suggestedDate = new Date(currentYear, monthIndex, day);
+                        
+                        const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+                        const selectedDayIndex = dayNames.indexOf(daySelect.value);
+                        
+                        if (selectedDayIndex !== -1) {
+                            const currentDay = suggestedDate.getDay();
+                            let daysToAdd = selectedDayIndex - currentDay;
+                            if (daysToAdd < 0) daysToAdd += 7;
+                            
+                            suggestedDate.setDate(suggestedDate.getDate() + daysToAdd);
+                            
+                            const year = suggestedDate.getFullYear();
+                            const month = String(suggestedDate.getMonth() + 1).padStart(2, '0');
+                            const date = String(suggestedDate.getDate()).padStart(2, '0');
+                            
+                            dateInput.value = `${year}-${month}-${date}`;
+                            formatSelectedDate();
+                        }
+                    }
+                }
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('clubName').value = '';
+            updateLogoPreview('');
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('campusSelect').value = '';
+            document.getElementById('isOnline').checked = false;
+            document.getElementById('fullDate').value = '';
+            document.getElementById('fullDateFormatted').value = '';
+        }
+        
+        // Logo yükleme ve base64'e çevirme - Logos klasöründen direkt al
+        async function loadLogoAsBase64(logoPath) {
+            return new Promise((resolve) => {
+                if (!logoPath || !logoPath.startsWith('logos/')) {
+                    resolve(null);
+                    return;
+                }
+                
+                // Önce sayfada bu logoyu kullanan bir img elementi var mı kontrol et
+                const existingImg = document.querySelector(`img[src*="${logoPath.replace('logos/', '')}"]`);
+                if (existingImg && existingImg.complete && existingImg.naturalHeight > 0) {
+                    // Mevcut img elementini kullan
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = existingImg.naturalWidth;
+                        canvas.height = existingImg.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(existingImg, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolve(base64);
+                        return;
+                    } catch (e) {
+                        console.warn('Mevcut img\'den base64 dönüştürme hatası:', e);
+                    }
+                }
+                
+                // Yeni Image objesi oluştur
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || img.width;
+                        canvas.height = img.naturalHeight || img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const base64 = canvas.toDataURL('image/png');
+                        resolve(base64);
+                    } catch (e) {
+                        console.warn('Base64 dönüştürme hatası:', e, logoPath);
+                        resolve(null);
+                    }
+                };
+                
+                img.onerror = () => {
+                    console.warn('Logo yükleme hatası (CORS olabilir):', logoPath);
+                    // CORS hatası için alternatif: base64 veritabanından kontrol et
+                    const fileName = logoPath.replace('logos/', '');
+                    // Kulüp adına göre base64 ara
+                    for (const club in clubLogoBase64Database) {
+                        if (clubLogoDatabase[club] === logoPath && clubLogoBase64Database[club]) {
+                            console.log('Base64 veritabanından bulundu:', club);
+                            resolve(clubLogoBase64Database[club]);
+                            return;
+                        }
+                    }
+                    resolve(null);
+                };
+                
+                // Timeout ekle
+                setTimeout(() => {
+                    if (!img.complete) {
+                        console.warn('Logo yükleme timeout:', logoPath);
+                        resolve(null);
+                    }
+                }, 5000);
+                
+                img.src = logoPath;
+            });
+        }
+        
+        // Tasarıma Dönüştür - Görseldeki gibi tasarım oluştur
+        async function convertToDesign() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Lütfen tarih aralığını girin!');
+                return;
+            }
+            
+            const dayColors = {
+                'Pazartesi': { main: '#e74c3c', light: '#fadbd8' },
+                'Salı': { main: '#f39c12', light: '#fdebd0' },
+                'Çarşamba': { main: '#f1c40f', light: '#fef9e7' },
+                'Perşembe': { main: '#2ecc71', light: '#d5f4e6' },
+                'Cuma': { main: '#3498db', light: '#d6eaf8' },
+                'Cumartesi': { main: '#9b59b6', light: '#ebdef0' },
+                'Pazar': { main: '#e67e22', light: '#fae5d3' }
+            };
+
+            // Logo veritabanı değişmiş olabilir → etkinlik logolarını güncelle
+            refreshEventLogosFromDatabase();
+            
+            // Önce tüm logoları base64'e çevir
+            const logoCache = {};
+            const uniqueLogos = new Set();
+            
+            Object.values(events).forEach(day => {
+                if (day.events) {
+                    day.events.forEach(event => {
+                        if (event.clubIcon && event.clubIcon.startsWith('logos/')) {
+                            uniqueLogos.add(event.clubIcon);
+                        } else if (event.clubIcon && event.clubIcon.startsWith('data:')) {
+                            // Base64 logoları cache'e ekle (hem kulüp adı hem de icon path ile)
+                            if (!logoCache[event.clubName]) {
+                                logoCache[event.clubName] = event.clubIcon;
+                            }
+                            // Ayrıca event.clubIcon'u da key olarak kullan (generateDesignEvents için)
+                            if (event.clubIcon) {
+                                logoCache[event.clubIcon] = event.clubIcon;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Loading mesajı göster
+            const preview = document.getElementById('designPreview');
+            preview.style.display = 'block';
+            preview.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">🔄 Logolar yükleniyor...</div>';
+            
+            // Header logolarını da base64'e çevir
+            const headerLogos = {
+                'üülogo': 'logos/üülogo.png',
+                'skslogo': 'logos/SKS LOGO.png'
+            };
+            
+            // Tüm logoları yükle (event logoları + header logoları)
+            let loaded = 0;
+            let total = uniqueLogos.size + Object.keys(headerLogos).length;
+            
+            // Event logolarını yükle - önce event verilerinden base64 kontrol et
+            for (const logoPath of uniqueLogos) {
+                let base64 = null;
+                
+                // Önce event verilerinde base64 var mı kontrol et
+                Object.values(events).forEach(day => {
+                    if (day.events) {
+                        day.events.forEach(event => {
+                            // Eğer event.clubIcon logoPath ile eşleşiyorsa ve base64 ise kullan
+                            if (event.clubIcon === logoPath && event.clubIcon.startsWith('data:')) {
+                                base64 = event.clubIcon;
+                            }
+                            // Veya event.clubIcon zaten base64 ise ve logoPath ile eşleşiyorsa
+                            else if (event.clubIcon && event.clubIcon.startsWith('data:') && event.clubIcon.includes(logoPath.replace('logos/', ''))) {
+                                base64 = event.clubIcon;
+                            }
+                        });
+                    }
+                });
+                
+                // Event verilerinde yoksa base64 veritabanından kontrol et
+                if (!base64) {
+                    for (const club in clubLogoBase64Database) {
+                        if (clubLogoDatabase[club] === logoPath) {
+                            base64 = clubLogoBase64Database[club];
+                            break;
+                        }
+                    }
+                }
+                
+                // Hala yoksa sayfada görünen img elementini kullan
+                if (!base64) {
+                    const existingImg = Array.from(document.querySelectorAll('.club-icon img, .event-card img')).find(img => {
+                        const src = img.src || img.getAttribute('src') || '';
+                        return src.includes(logoPath.replace('logos/', '')) || src.includes(encodeURI(logoPath)) || src.startsWith('data:');
+                    });
+                    
+                    if (existingImg && existingImg.complete && existingImg.naturalHeight > 0) {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = existingImg.naturalWidth;
+                            canvas.height = existingImg.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(existingImg, 0, 0);
+                            base64 = canvas.toDataURL('image/png');
+                            console.log('✅ Logo sayfadan base64\'e çevrildi:', logoPath);
+                        } catch (e) {
+                            console.warn('⚠️ Logo canvas hatası:', e, logoPath);
+                        }
+                    }
+                }
+                
+                if (base64) {
+                    logoCache[logoPath] = base64;
+                    loaded++;
+                    console.log('✅ Logo cache\'e eklendi:', logoPath.substring(0, 30));
+                } else {
+                    console.warn('❌ Logo yüklenemedi:', logoPath);
+                }
+            }
+            
+            // Header logolarını yükle - önce base64 veritabanından kontrol et
+            let headerUULogoBase64 = null;
+            let headerSKSLogoBase64 = null;
+
+            // Toplu içe aktarımdan gelen header base64 (file:// için en güvenilir yol)
+            try {
+                const uuFromLS = localStorage.getItem('headerUULogoBase64');
+                const sksFromLS = localStorage.getItem('headerSKSLogoBase64');
+                if (uuFromLS && uuFromLS.startsWith('data:')) headerUULogoBase64 = uuFromLS;
+                if (sksFromLS && sksFromLS.startsWith('data:')) headerSKSLogoBase64 = sksFromLS;
+            } catch (_) {}
+            
+            // ÜÜ logo için base64 veritabanından kontrol et
+            if (!headerUULogoBase64) {
+                for (const club in clubLogoBase64Database) {
+                    if (clubLogoDatabase[club] === headerLogos.üülogo) {
+                        headerUULogoBase64 = clubLogoBase64Database[club];
+                        break;
+                    }
+                }
+            }
+            
+            // SKS logo için base64 veritabanından kontrol et
+            if (!headerSKSLogoBase64) {
+                for (const club in clubLogoBase64Database) {
+                    if (clubLogoDatabase[club] === headerLogos.skslogo) {
+                        headerSKSLogoBase64 = clubLogoBase64Database[club];
+                        break;
+                    }
+                }
+            }
+            
+            // Base64 veritabanında yoksa sayfada yüklü img elementlerini kullan
+            if (!headerUULogoBase64) {
+                // Önce sayfada görünen tüm img elementlerini kontrol et
+                const allImages = Array.from(document.querySelectorAll('img'));
+                console.log('Sayfada toplam img sayısı:', allImages.length);
+                
+                const uuLogoImg = allImages.find(img => {
+                    const src = img.src || img.getAttribute('src') || '';
+                    const alt = img.alt || '';
+                    const fileName = src.split('/').pop() || '';
+                    console.log('Img kontrol:', { src: src.substring(0, 50), alt, fileName, complete: img.complete, naturalHeight: img.naturalHeight });
+                    return (src.includes('üülogo') || src.includes('uu logo') || src.includes('üü') || 
+                            alt.includes('ÜÜ') || fileName.toLowerCase().includes('üü') || fileName.toLowerCase().includes('uu')) && 
+                           img.complete && img.naturalHeight > 0;
+                });
+                
+                if (uuLogoImg) {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = uuLogoImg.naturalWidth;
+                        canvas.height = uuLogoImg.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(uuLogoImg, 0, 0);
+                        headerUULogoBase64 = canvas.toDataURL('image/png');
+                        console.log('ÜÜ logo sayfadan base64\'e çevrildi');
+                        loaded++;
+                    } catch (e) {
+                        console.warn('ÜÜ logo base64 dönüştürme hatası:', e);
+                    }
+                } else {
+                    console.warn('ÜÜ logo sayfada bulunamadı');
+                }
+            } else {
+                loaded++;
+            }
+            
+            if (!headerSKSLogoBase64) {
+                // Önce sayfada görünen tüm img elementlerini kontrol et
+                const allImages = Array.from(document.querySelectorAll('img'));
+                const sksLogoImg = allImages.find(img => {
+                    const src = img.src || img.getAttribute('src') || '';
+                    const alt = img.alt || '';
+                    const fileName = src.split('/').pop() || '';
+                    console.log('SKS Img kontrol:', { src: src.substring(0, 50), alt, fileName, complete: img.complete, naturalHeight: img.naturalHeight });
+                    return (src.includes('SKS') || src.includes('sks') || 
+                            alt.includes('SKS') || alt.includes('sks') || 
+                            fileName.toUpperCase().includes('SKS')) && 
+                           img.complete && img.naturalHeight > 0;
+                });
+                
+                if (sksLogoImg) {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = sksLogoImg.naturalWidth;
+                        canvas.height = sksLogoImg.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(sksLogoImg, 0, 0);
+                        headerSKSLogoBase64 = canvas.toDataURL('image/png');
+                        console.log('SKS logo sayfadan base64\'e çevrildi');
+                        loaded++;
+                    } catch (e) {
+                        console.warn('SKS logo base64 dönüştürme hatası:', e);
+                    }
+                } else {
+                    console.warn('SKS logo sayfada bulunamadı');
+                }
+            } else {
+                loaded++;
+            }
+            
+            // Hala yüklenemediyse loadLogoAsBase64 ile dene (son çare - muhtemelen başarısız olacak)
+            if (!headerUULogoBase64) {
+                headerUULogoBase64 = await loadLogoAsBase64(headerLogos.üülogo);
+                if (headerUULogoBase64) loaded++;
+            }
+            if (!headerSKSLogoBase64) {
+                headerSKSLogoBase64 = await loadLogoAsBase64(headerLogos.skslogo);
+                if (headerSKSLogoBase64) loaded++;
+            }
+            
+            dlog(`Logolar yüklendi: ${loaded}/${total}`);
+            dlog('ÜÜ Logo base64:', headerUULogoBase64 ? 'Var' : 'Yok');
+            dlog('SKS Logo base64:', headerSKSLogoBase64 ? 'Var' : 'Yok');
+            dlog('Logo cache boyutu:', Object.keys(logoCache).length);
+            
+            // Tasarımı oluştur
+            preview.innerHTML = `
+                <div id="designContainer" style="background: #f5f5f5; padding: 30px; border-radius: 12px; max-width: 1000px; margin: 0 auto; width: calc(100% - 80px);">
+                    <div style="background: #1a5f5f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <div style="background: #1a5f5f; padding: 25px 20px; border-radius: 0; position: relative;">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="width: 100%;">
+                            <tr>
+                                <td width="25%" align="left" valign="middle" style="padding: 0;">
+                                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin: 0 auto; background: white; display: flex; align-items: center; justify-content: center;">
+                                        ${headerUULogoBase64 ? `<img src="${headerUULogoBase64}" alt="ÜÜ Logo" id="headerUULogo" style="width: 100%; height: 100%; object-fit: contain; display: block;" crossorigin="anonymous">` : '<div style="width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; color: #999; font-size: 10px; text-align: center; padding: 5px;">ÜÜ</div>'}
+                                    </div>
+                                </td>
+                                <td width="50%" align="center" valign="middle" style="padding: 0 30px;">
+                                    <div style="color: #ffffff; font-size: 16px; font-weight: bold; margin-bottom: 8px;">ÜSKÜDAR ÜNİVERSİTESİ</div>
+                                    <div style="color: #ffffff; font-size: 22px; font-weight: bold;">SAĞLIK, KÜLTÜR VE SPOR DAİRE BAŞKANLIĞI</div>
+                                </td>
+                                <td width="25%" align="right" valign="middle" style="padding: 0;">
+                                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin: 0 auto; background: white; display: flex; align-items: center; justify-content: center;">
+                                        ${headerSKSLogoBase64 ? `<img src="${headerSKSLogoBase64}" alt="SKS Logo" id="headerSKSLogo" style="width: 100%; height: 100%; object-fit: contain; display: block;" crossorigin="anonymous">` : '<div style="width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; color: #999; font-size: 10px; text-align: center; padding: 5px;">SKS</div>'}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Date Banner -->
+                    <div style="background: #ffd700; padding: 15px; text-align: center; border-radius: 0;">
+                        <div style="color: #1a5f5f; font-size: 20px; font-weight: bold;">${startDate} - ${endDate} HAFTASI</div>
+                    </div>
+                    
+                    <!-- Events -->
+                    ${generateDesignEvents(dayColors, logoCache)}
+                    
+                    <!-- Footer -->
+                    <div style="background: #1a5f5f; padding: 20px; text-align: center; border-radius: 0; color: #ffffff; font-size: 12px;">
+                        <div style="margin-bottom: 10px;">Detaylı bilgi için; <a href="https://www.sks.uskudar.edu.tr" style="color: #ffd700; text-decoration: none;">www.sks.uskudar.edu.tr</a></div>
+                        <div>@uskudarsks</div>
+                    </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+            
+            // Tasarım oluşturulduktan sonra görsellerin yüklendiğinden emin ol
+            setTimeout(async () => {
+                const designContainer = document.getElementById('designContainer');
+                if (designContainer) {
+                    const designImages = designContainer.querySelectorAll('img');
+                    dlog('🔍 Tasarım oluşturuldu, görsel sayısı:', designImages.length);
+                    
+                    // Tüm görsellerin yüklendiğinden emin ol
+                    const loadPromises = [];
+                    designImages.forEach((img, index) => {
+                        const src = img.src || img.getAttribute('src') || '';
+                        dlog(`  Görsel ${index + 1}:`, src.substring(0, 60), '| yüklü:', img.complete, '| boyut:', img.naturalWidth, 'x', img.naturalHeight);
+                        
+                        if (!img.complete || img.naturalHeight === 0) {
+                            loadPromises.push(new Promise((resolve) => {
+                                const timeout = setTimeout(() => {
+                                    dwarn(`Görsel ${index + 1} yükleme timeout`);
+                                    resolve();
+                                }, 5000);
+                                
+                                img.onload = () => {
+                                    clearTimeout(timeout);
+                                    dlog(`✅ Görsel ${index + 1} yüklendi`);
+                                    resolve();
+                                };
+                                
+                                img.onerror = () => {
+                                    clearTimeout(timeout);
+                                    console.error(`❌ Görsel ${index + 1} yüklenemedi`);
+                                    resolve();
+                                };
+                            }));
+                        }
+                    });
+                    
+                    await Promise.all(loadPromises);
+                    dlog('✅ Tüm görseller hazır');
+                } else {
+                    console.error('❌ designContainer bulunamadı!');
+                }
+            }, 500);
+            
+            preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function generateDesignEvents(dayColors, logoCache = {}) {
+            const dayOrder = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            let html = '';
+            
+            dayOrder.forEach(day => {
+                if (events[day] && events[day].events.length > 0) {
+                    const dayColor = dayColors[day];
+                    html += `
+                        <div style="margin-top: 20px;">
+                            <!-- Day Header -->
+                            <div style="background: ${dayColor.main}; color: white; padding: 12px 20px; font-weight: bold; font-size: 16px; border-radius: 6px 6px 0 0;">
+                                ${events[day].date} - ${day.toUpperCase()}
+                            </div>
+                            
+                            <!-- Events Grid -->
+                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                                ${events[day].events.map(event => {
+                                    const locationIcon = event.isOnline ? '🌐' : '📍';
+                                    const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
+                                    const locationText = event.isOnline ? 'ZOOM Çevrimiçi' : event.location;
+                                    
+                                    let logoHTML = '🎯';
+                                    if (event.clubIcon) {
+                                        if (event.clubIcon.startsWith('data:')) {
+                                            // Base64 - direkt kullan
+                                            logoHTML = `<img src="${event.clubIcon}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" crossorigin="anonymous">`;
+                                        } else if (event.clubIcon.startsWith('logos/')) {
+                                            // Önce base64 cache'den kontrol et
+                                            let base64Logo = logoCache[event.clubIcon];
+                                            
+                                            // Cache'de yoksa base64 veritabanından kontrol et
+                                            if (!base64Logo && event.clubName && clubLogoBase64Database[event.clubName]) {
+                                                base64Logo = clubLogoBase64Database[event.clubName];
+                                            }
+                                            
+                                            // Hala yoksa, kulüp adına göre base64 veritabanından ara
+                                            if (!base64Logo) {
+                                                for (const club in clubLogoBase64Database) {
+                                                    if (clubLogoDatabase[club] === event.clubIcon) {
+                                                        base64Logo = clubLogoBase64Database[club];
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (base64Logo) {
+                                                // Base64 logo bulundu - kullan
+                                                logoHTML = `<img src="${base64Logo}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" crossorigin="anonymous">`;
+                                            } else {
+                                                // Base64 yoksa önizlemede dosya yolunu kullan (listeyle aynı görünsün)
+                                                // Not: file:// altında indirme için base64 gerekir; downloadDesign bunu kontrol ediyor.
+                                                const encodedPath = encodeURI(event.clubIcon);
+                                                logoHTML = `<img src="${encodedPath}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="font-size: 40px; display:none;">🎯</span>`;
+                                            }
+                                        } else {
+                                            // Emoji
+                                            logoHTML = `<span style="font-size: 40px;">${event.clubIcon}</span>`;
+                                        }
+                                    }
+                                    
+                                    return `
+                                        <div style="background: #2a7a7a; border-radius: 6px; padding: 15px; display: flex; gap: 12px; align-items: flex-start; min-width: 0;">
+                                            <div style="width: 50px; height: 50px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                ${logoHTML}
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="color: white; font-size: 11px; font-weight: bold; margin-bottom: 4px;">${event.clubName}</div>
+                                                <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">${event.eventTitle}</div>
+                                                <div style="color: white; font-size: 11px; margin-bottom: 2px;">🕐 ${event.time}</div>
+                                                <div style="color: ${locationColor}; font-size: 11px;">${locationIcon} ${locationText}</div>
+                                                ${event.campus ? `<div style="color: white; font-size: 10px; margin-top: 2px; opacity: 0.9;">${event.campus}</div>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            return html;
+        }
+        
+        // Logoları base64'e çevir - CORS sorunlarını çözmek için
+        async function convertImageToBase64(img) {
+            return new Promise((resolve) => {
+                // Eğer zaten base64 ise direkt döndür
+                if (img.src.startsWith('data:')) {
+                    resolve(img.src);
+                    return;
+                }
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Yeni bir Image objesi oluştur
+                const newImg = new Image();
+                newImg.crossOrigin = 'anonymous';
+                
+                newImg.onload = () => {
+                    try {
+                        canvas.width = newImg.width;
+                        canvas.height = newImg.height;
+                        ctx.drawImage(newImg, 0, 0);
+                        const dataURL = canvas.toDataURL('image/png');
+                        resolve(dataURL);
+                    } catch (e) {
+                        console.warn('Base64 dönüştürme hatası:', e);
+                        resolve(null);
+                    }
+                };
+                
+                newImg.onerror = () => {
+                    console.warn('Logo yükleme hatası:', img.src);
+                    resolve(null);
+                };
+                
+                // Eğer zaten yüklenmişse
+                if (img.complete && img.naturalHeight !== 0) {
+                    newImg.src = img.src;
+                } else {
+                    img.addEventListener('load', () => {
+                        newImg.src = img.src;
+                    }, { once: true });
+                    img.addEventListener('error', () => {
+                        resolve(null);
+                    }, { once: true });
+                    // Tekrar yükle
+                    const originalSrc = img.src;
+                    img.src = '';
+                    img.src = originalSrc;
+                }
+            });
+        }
+        
+        // Tasarımdaki tüm logoları base64'e çevir
+        async function convertAllLogosToBase64() {
+            const container = document.getElementById('designContainer');
+            if (!container) {
+                console.warn('designContainer bulunamadı!');
+                return;
+            }
+            
+            // Tüm img elementlerini bul
+            const images = container.querySelectorAll('img');
+            console.log('Toplam görsel sayısı:', images.length);
+            
+            if (images.length === 0) {
+                console.warn('Hiç görsel bulunamadı!');
+                return;
+            }
+            
+            // Tüm görselleri canvas ile base64'e çevir (CORS sorununu çözmek için)
+            const loadPromises = [];
+            images.forEach((img, index) => {
+                const currentSrc = img.src || img.getAttribute('src') || '';
+                console.log(`Görsel ${index + 1}:`, currentSrc.substring(0, 80));
+                
+                // Eğer zaten base64 ise atla
+                if (currentSrc && currentSrc.startsWith('data:')) {
+                    console.log(`Görsel ${index + 1} zaten base64`);
+                    return;
+                }
+                
+                // Görsel yüklenmişse canvas ile base64'e çevir
+                if (img.complete && img.naturalHeight > 0) {
+                    loadPromises.push(new Promise((resolve) => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const base64 = canvas.toDataURL('image/png');
+                            img.src = base64;
+                            console.log(`Görsel ${index + 1} base64'e çevrildi (canvas - yüklü)`);
+                            resolve();
+                        } catch (e) {
+                            console.warn(`Görsel ${index + 1} canvas hatası:`, e);
+                            resolve();
+                        }
+                    }));
+                } else {
+                    // Görsel henüz yüklenmemişse bekle
+                    loadPromises.push(new Promise((resolve) => {
+                        const timeout = setTimeout(() => {
+                            console.warn(`Görsel ${index + 1} yükleme timeout`);
+                            resolve();
+                        }, 5000);
+                        
+                        const onLoad = () => {
+                            clearTimeout(timeout);
+                            try {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.naturalWidth;
+                                canvas.height = img.naturalHeight;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0);
+                                const base64 = canvas.toDataURL('image/png');
+                                img.src = base64;
+                                console.log(`Görsel ${index + 1} base64'e çevrildi (canvas - onload)`);
+                                resolve();
+                            } catch (e) {
+                                console.warn(`Görsel ${index + 1} canvas hatası:`, e);
+                                resolve();
+                            }
+                        };
+                        
+                        if (img.complete) {
+                            onLoad();
+                        } else {
+                            img.addEventListener('load', onLoad, { once: true });
+                            img.addEventListener('error', () => {
+                                clearTimeout(timeout);
+                                console.warn(`Görsel ${index + 1} yüklenemedi`);
+                                resolve();
+                            }, { once: true });
+                        }
+                    }));
+                }
+            });
+            
+            await Promise.all(loadPromises);
+            const convertedCount = Array.from(images).filter(img => {
+                const src = img.src || img.getAttribute('src') || '';
+                return src.startsWith('data:');
+            }).length;
+            console.log('Base64 dönüşümü tamamlandı, yüklenen:', convertedCount, '/', images.length);
+            
+            // Ekstra bekleme - görsellerin render edilmesi için
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+        // Tüm görsellerin yüklendiğinden emin ol
+        async function waitForImages(container) {
+            const images = container.querySelectorAll('img');
+            const promises = [];
+            
+            images.forEach(img => {
+                if (img.complete && img.naturalHeight !== 0) {
+                    return; // Zaten yüklenmiş
+                }
+                
+                promises.push(new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve; // Hata olsa bile devam et
+                    // Timeout ekle
+                    setTimeout(resolve, 3000);
+                }));
+            });
+            
+            await Promise.all(promises);
+        }
+        
+        // Tasarımı İndir
+        async function downloadDesign() {
+            // Önce designContainer'ı bul
+            let container = document.getElementById('designContainer');
+            
+            // Eğer bulunamazsa, preview içinde ara
+            if (!container) {
+                const preview = document.getElementById('designPreview');
+                if (preview) {
+                    container = preview.querySelector('#designContainer');
+                }
+            }
+            
+            if (!container) {
+                alert('Önce tasarımı oluşturun! "Tasarıma Dönüştür" butonuna tıklayın.');
+                return;
+            }
+            
+            dlog('Container bulundu:', container);
+            dlog('Container içindeki img sayısı:', container.querySelectorAll('img').length);
+            
+            try {
+                // Loading mesajı göster
+                const downloadBtn = document.getElementById('downloadBtn');
+                const originalText = downloadBtn.textContent;
+                downloadBtn.textContent = '⏳ Yükleniyor...';
+                downloadBtn.disabled = true;
+                
+                // html2canvas kütüphanesini dinamik yükle
+                if (typeof html2canvas === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                    document.head.appendChild(script);
+                    await new Promise((resolve) => {
+                        script.onload = resolve;
+                    });
+                }
+                
+                // Tüm görsellerin yüklendiğinden emin ol
+                dlog('Görseller kontrol ediliyor...');
+                const images = container.querySelectorAll('img');
+                dlog('Toplam görsel sayısı:', images.length);
+                if (images.length === 0) {
+                    // Tasarım img içermese bile indirilebilir.
+                    dlog('ℹ️ Tasarımda <img> yok. Render/indirme devam edecek.');
+                }
+
+                // file:// altında base64 olmayan img varsa indirme boş çıkabilir → erken uyarı
+                const isFileProtocol = (window.location && window.location.protocol === 'file:');
+                if (isFileProtocol) {
+                    const nonBase64 = Array.from(images).filter(img => {
+                        const src = img.src || img.getAttribute('src') || '';
+                        return src && !src.startsWith('data:');
+                    });
+                    if (nonBase64.length > 0) {
+                        alert(`⚠️ İndirme engellendi: Bazı logolar base64 değil.\n\nNeden: Chrome, file:// altında dosya yolundaki görselleri canvas'a çizdirmiyor.\n\nÇözüm:\n- Logo Yönetim Paneli → Toplu Logo İçe Aktar (Klasör Seç)\nveya\n- İlgili kulübü seçip logo yükle → Kaydet\n\nSonra tekrar “Tasarıma Dönüştür” → “Tasarımı İndir”.`);
+                        downloadBtn.textContent = originalText;
+                        downloadBtn.disabled = false;
+                        return;
+                    }
+                }
+                
+                // Tüm görsellerin yüklendiğinden emin ol
+                const imagePromises = [];
+                images.forEach((img, index) => {
+                    const src = img.src || img.getAttribute('src') || '';
+                    dlog(`Görsel ${index + 1} src:`, src.substring(0, 50), '| base64:', src.startsWith('data:'));
+                    
+                    // Görselin yüklendiğinden emin ol
+                    if (img.complete && img.naturalHeight > 0 && img.naturalWidth > 0) {
+                        dlog(`✅ Görsel ${index + 1} yüklü (${img.naturalWidth}x${img.naturalHeight})`);
+                    } else {
+                        imagePromises.push(new Promise((resolve) => {
+                            const timeout = setTimeout(() => {
+                                dwarn(`⚠️ Görsel ${index + 1} yükleme timeout`);
+                                resolve();
+                            }, 5000);
+                            
+                            const checkLoaded = () => {
+                                if (img.complete && img.naturalHeight > 0 && img.naturalWidth > 0) {
+                                    clearTimeout(timeout);
+                                    dlog(`✅ Görsel ${index + 1} yüklendi (${img.naturalWidth}x${img.naturalHeight})`);
+                                    resolve();
+                                }
+                            };
+                            
+                            img.onload = checkLoaded;
+                            img.onerror = () => {
+                                clearTimeout(timeout);
+                                console.error(`❌ Görsel ${index + 1} yüklenemedi`);
+                                resolve();
+                            };
+                            
+                            if (img.complete) {
+                                checkLoaded();
+                            }
+                        }));
+                    }
+                });
+                
+                await Promise.all(imagePromises);
+                dlog('✅ Tüm görseller yüklendi');
+                
+                // Ekstra bekleme - render için
+                if (document.fonts && document.fonts.ready) {
+                    try { await document.fonts.ready; } catch (_) {}
+                }
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+                
+                dlog('Canvas oluşturuluyor...');
+                
+                // html2canvas için basit ayarlar - görseller zaten base64
+                const canvas = await html2canvas(container, {
+                    backgroundColor: '#f5f5f5',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true,
+                    foreignObjectRendering: false,
+                    imageTimeout: 30000
+                });
+                
+                dlog('Canvas oluşturuldu, boyut:', canvas.width, 'x', canvas.height);
+                
+                // Canvas'ın boş olup olmadığını kontrol et - daha kapsamlı kontrol
+                const ctx = canvas.getContext('2d');
+                const sampleSize = Math.min(200, Math.min(canvas.width, canvas.height));
+                const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+                const pixels = imageData.data;
+                let hasContent = false;
+                let nonTransparentPixels = 0;
+                
+                for (let i = 0; i < pixels.length; i += 4) {
+                    // Alpha değeri 0'dan büyükse içerik var demektir
+                    if (pixels[i + 3] > 10) { // 10'dan büyük alpha değeri (tamamen şeffaf değil)
+                        nonTransparentPixels++;
+                        if (nonTransparentPixels > 100) { // En az 100 piksel içerik var
+                            hasContent = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!hasContent) {
+                    console.error('⚠️ Canvas boş görünüyor! Toplam içerikli piksel:', nonTransparentPixels);
+                    console.error('Canvas boyutu:', canvas.width, 'x', canvas.height);
+                    alert('Uyarı: İndirilen görsel boş görünüyor. Lütfen console loglarını kontrol edin ve "Tasarıma Dönüştür" butonuna tekrar tıklayın.');
+                    downloadBtn.textContent = originalText;
+                    downloadBtn.disabled = false;
+                    return;
+                } else {
+                    dlog('✅ Canvas içerik içeriyor (', nonTransparentPixels, 'piksel)');
+                }
+                
+                const link = document.createElement('a');
+                link.download = `etkinlik-programi-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                
+                dlog('Tasarım indirildi!');
+                
+                // Butonu eski haline getir
+                downloadBtn.textContent = originalText;
+                downloadBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('İndirme hatası:', error);
+                alert('İndirme sırasında bir hata oluştu: ' + error.message);
+                
+                // Butonu eski haline getir
+                const downloadBtn = document.getElementById('downloadBtn');
+                if (downloadBtn) {
+                    downloadBtn.textContent = '💾 Tasarımı İndir';
+                    downloadBtn.disabled = false;
+                }
+            }
+        }
+        
+        function updateLogoPreview(clubName) {
+            const logoPreview = document.getElementById('logoPreview');
+            if (!logoPreview) return;
+            
+            const logoSrc = getLogoSource(clubName);
+            if (logoSrc) {
+                if (logoSrc.startsWith('data:')) {
+                    // Base64
+                    logoPreview.innerHTML = `<img src="${logoSrc}" alt="Logo" style="max-width: 50px; max-height: 50px; object-fit: contain;">`;
+                } else if (logoSrc.startsWith('logos/')) {
+                    // Dosya yolu
+                    logoPreview.innerHTML = `<img src="${logoSrc}" alt="Logo" style="max-width: 50px; max-height: 50px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size: 28px;">🎯</span>`;
+                } else {
+                    // Emoji
+                    logoPreview.innerHTML = `<span style="font-size: 28px;">${logoSrc}</span>`;
+                }
+            } else {
+                logoPreview.innerHTML = `<span style="font-size: 28px;">🎯</span>`;
+            }
+        }
+
+        function makeEditable(element, field, day, index) {
+            element.addEventListener('dblclick', () => {
+                if (element.classList.contains('editing')) return;
+                
+                const originalText = element.textContent.replace(/🕐|📍|🌐/g, '').trim();
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = originalText;
+                input.style.width = '100%';
+                input.style.border = '1px solid #ffc107';
+                input.style.padding = '4px';
+                input.style.borderRadius = '3px';
+                input.style.fontSize = 'inherit';
+                input.style.fontFamily = 'inherit';
+                
+                element.classList.add('editing');
+                element.innerHTML = '';
+                element.appendChild(input);
+                input.focus();
+                input.select();
+                
+                const save = () => {
+                    const newValue = input.value.trim();
+                    if (newValue && newValue !== originalText) {
+                        if (field === 'clubName') {
+                            events[day].events[index].clubName = newValue;
+                            const logoSrc = getLogoSource(newValue);
+                            events[day].events[index].clubIcon = logoSrc || '🎯';
+                        } else if (field === 'eventTitle') {
+                            events[day].events[index].eventTitle = newValue;
+                        } else if (field === 'time') {
+                            events[day].events[index].time = newValue;
+                        } else if (field === 'location') {
+                            events[day].events[index].location = newValue;
+                        } else if (field === 'campus') {
+                            events[day].events[index].campus = newValue;
+                        }
+                        renderEvents();
+                    } else {
+                        element.classList.remove('editing');
+                        renderEvents();
+                    }
+                };
+                
+                input.addEventListener('blur', save);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        save();
+                    }
+                });
+            });
+        }
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.event-card');
+            cards.forEach(card => {
+                card.draggable = true;
+                card.addEventListener('dragstart', (e) => {
+                    draggedElement = card;
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    draggedElement = null;
+                });
+                
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    const afterElement = getDragAfterElement(card.parentElement, e.clientX);
+                    if (afterElement == null) {
+                        card.parentElement.appendChild(draggedElement);
+                    } else {
+                        card.parentElement.insertBefore(draggedElement, afterElement);
+                    }
+                });
+            });
+        }
+
+        function getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.event-card:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function renderEvents() {
+            console.log('renderEvents çağrıldı, events:', events);
+            const container = document.getElementById('eventsList');
+            if (!container) {
+                console.error('eventsList container bulunamadı!');
+                return;
+            }
+            container.innerHTML = '';
+
+            const dayOrder = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+            const dayClasses = {
+                'Pazartesi': 'pazartesi',
+                'Salı': 'sali',
+                'Çarşamba': 'carsamba',
+                'Perşembe': 'persembe',
+                'Cuma': 'cuma',
+                'Cumartesi': 'cumartesi',
+                'Pazar': 'pazar'
+            };
+            
+            dayOrder.forEach(day => {
+                if (events[day] && events[day].events.length > 0) {
+                    const daySection = document.createElement('div');
+                    daySection.className = `day-section ${dayClasses[day]}`;
+                    
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'day-header';
+                    dayHeader.textContent = `${events[day].date} - ${day.toUpperCase()}`;
+                    
+                    dayHeader.addEventListener('dblclick', () => {
+                        const input = document.createElement('input');
+                        input.value = dayHeader.textContent;
+                        input.style.width = '100%';
+                        input.style.border = 'none';
+                        input.style.background = 'transparent';
+                        input.style.color = 'inherit';
+                        input.style.fontSize = 'inherit';
+                        input.style.fontWeight = 'inherit';
+                        dayHeader.classList.add('editing');
+                        dayHeader.innerHTML = '';
+                        dayHeader.appendChild(input);
+                        input.focus();
+                        input.select();
+                        
+                        input.addEventListener('blur', () => {
+                            events[day].date = input.value;
+                            dayHeader.classList.remove('editing');
+                            renderEvents();
+                        });
+                        
+                        input.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                input.blur();
+                            }
+                        });
+                    });
+                    
+                    daySection.appendChild(dayHeader);
+
+                    const eventsGrid = document.createElement('div');
+                    eventsGrid.className = 'events-grid';
+
+                    events[day].events.forEach((event, index) => {
+                        const eventCard = document.createElement('div');
+                        eventCard.className = 'event-card';
+                        eventCard.draggable = true;
+                        eventCard.dataset.day = day;
+                        eventCard.dataset.index = index;
+                        
+                        const locationIcon = event.isOnline ? '🌐' : '📍';
+                        const locationClass = event.isOnline ? 'online' : '';
+                        
+                        let clubIconDisplay = '🎯';
+                        console.log('Event logo render:', event.clubName, 'clubIcon:', event.clubIcon ? (event.clubIcon.substring ? event.clubIcon.substring(0, 30) + '...' : event.clubIcon) : 'yok');
+                        
+                        if (event.clubIcon) {
+                            if (typeof event.clubIcon === 'string' && event.clubIcon.startsWith('data:')) {
+                                // Base64
+                                clubIconDisplay = `<img src="${event.clubIcon}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="font-size: 40px; display: none;">🎯</span>`;
+                            } else if (typeof event.clubIcon === 'string' && event.clubIcon.startsWith('logos/')) {
+                                // Dosya yolu - Türkçe karakterler ve boşluklar için encode
+                                const encodedPath = encodeURI(event.clubIcon).replace(/'/g, '%27');
+                                clubIconDisplay = `<img src="${encodedPath}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('Logo yüklenemedi:', '${encodedPath}');"><span style="font-size: 40px; display: none;">🎯</span>`;
+                            } else if (typeof event.clubIcon === 'string') {
+                                // Emoji veya diğer string
+                                clubIconDisplay = `<span style="font-size: 40px;">${event.clubIcon}</span>`;
+                            }
+                        } else {
+                            // Logo yoksa, tekrar getLogoSource ile dene
+                            const logoSrc = getLogoSource(event.clubName);
+                            if (logoSrc) {
+                                if (logoSrc.startsWith('data:')) {
+                                    clubIconDisplay = `<img src="${logoSrc}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="font-size: 40px; display: none;">🎯</span>`;
+                                } else if (logoSrc.startsWith('logos/')) {
+                                    const encodedPath = encodeURI(logoSrc).replace(/'/g, '%27');
+                                    clubIconDisplay = `<img src="${encodedPath}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; display: block;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('Logo yüklenemedi:', '${encodedPath}');"><span style="font-size: 40px; display: none;">🎯</span>`;
+                                } else {
+                                    clubIconDisplay = `<span style="font-size: 40px;">${logoSrc}</span>`;
+                                }
+                            } else {
+                                // Logo yoksa emoji göster
+                                clubIconDisplay = `<span style="font-size: 40px;">🎯</span>`;
+                            }
+                        }
+                        
+                        const locationText = event.isOnline ? 'ZOOM Çevrimiçi' : event.location;
+                        const campusText = event.campus ? event.campus : '';
+                        
+                        eventCard.innerHTML = `
+                            <button class="delete-btn" onclick="deleteEvent('${day}', ${index})">×</button>
+                            <div class="club-icon">${clubIconDisplay}</div>
+                            <div class="event-content">
+                                <div class="club-name">${event.clubName}</div>
+                                <div class="event-title">${event.eventTitle}</div>
+                                <div class="event-time">🕐 ${event.time}</div>
+                                <div class="event-location ${locationClass}">${locationIcon} ${locationText}</div>
+                                ${campusText ? `<div class="event-campus" style="font-size: 10px; color: #666; margin-top: 2px;">${campusText}</div>` : ''}
+                            </div>
+                        `;
+                        
+                        const clubNameEl = eventCard.querySelector('.club-name');
+                        const eventTitleEl = eventCard.querySelector('.event-title');
+                        const eventTimeEl = eventCard.querySelector('.event-time');
+                        const eventLocationEl = eventCard.querySelector('.event-location');
+                        
+                        makeEditable(clubNameEl, 'clubName', day, index);
+                        makeEditable(eventTitleEl, 'eventTitle', day, index);
+                        makeEditable(eventTimeEl, 'time', day, index);
+                        makeEditable(eventLocationEl, 'location', day, index);
+                        const eventCampusEl = eventCard.querySelector('.event-campus');
+                        if (eventCampusEl) {
+                            makeEditable(eventCampusEl, 'campus', day, index);
+                        }
+                        
+                        eventsGrid.appendChild(eventCard);
+                    });
+
+                    daySection.appendChild(eventsGrid);
+                    container.appendChild(daySection);
+                }
+            });
+            
+            setupDragAndDrop();
+        }
+
+        function initClubList() {
+            const datalist = document.getElementById('clubList');
+            clubNames.forEach(club => {
+                const option = document.createElement('option');
+                option.value = club;
+                datalist.appendChild(option);
+            });
+        }
+
+        function filterClubList() {
+            const input = document.getElementById('clubName');
+            const value = input.value.toLowerCase();
+            const datalist = document.getElementById('clubList');
+            
+            datalist.innerHTML = '';
+            clubNames.filter(club => club.toLowerCase().includes(value)).forEach(club => {
+                const option = document.createElement('option');
+                option.value = club;
+                datalist.appendChild(option);
+            });
+        }
+
+        function initTimeSelector() {
+            const timeSelect = document.getElementById('eventTime');
+            if (!timeSelect) return;
+            
+            for (let hour = 1; hour <= 23; hour++) {
+                const hourStr = hour.toString().padStart(2, '0');
+                const option1 = document.createElement('option');
+                option1.value = `${hourStr}:00`;
+                option1.textContent = `${hourStr}:00`;
+                timeSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = `${hourStr}:30`;
+                option2.textContent = `${hourStr}:30`;
+                timeSelect.appendChild(option2);
+            }
+            
+            const option24 = document.createElement('option');
+            option24.value = '24:00';
+            option24.textContent = '24:00';
+            timeSelect.appendChild(option24);
+        }
+
+        function setupClubAutoSelect() {
+            const clubNameInput = document.getElementById('clubName');
+            if (clubNameInput) {
+                clubNameInput.addEventListener('change', function() {
+                    updateLogoPreview(this.value);
+                });
+                clubNameInput.addEventListener('input', function() {
+                    setTimeout(() => {
+                        updateLogoPreview(this.value);
+                    }, 100);
+                });
+            }
+        }
+
+
+        // Logo Yönetim Paneli
+        function openLogoManager() {
+            const modal = document.getElementById('logoManagerModal');
+            if (!modal) return;
+            
+            modal.style.display = 'flex';
+            // Header logo önizlemelerini yükle
+            try { renderHeaderLogoManagerPreviews(); } catch (_) {}
+            
+            // Kulüp listesini doldur
+            const clubSelect = document.getElementById('logoManagerClubSelect');
+            clubSelect.innerHTML = '<option value="">Kulüp seçin...</option>';
+            clubNames.forEach(club => {
+                const option = document.createElement('option');
+                option.value = club;
+                option.textContent = club;
+                clubSelect.appendChild(option);
+            });
+            
+            // Mevcut eşleştirmeleri göster
+            displayLogoMappings();
+            
+            // Kulüp seçildiğinde mevcut logoyu göster
+            clubSelect.addEventListener('change', function() {
+                const selectedClub = this.value;
+                if (selectedClub && clubLogoDatabase[selectedClub]) {
+                    const logoPath = clubLogoDatabase[selectedClub];
+                    document.getElementById('logoManagerFileName').value = logoPath.replace('logos/', '');
+                    updateLogoManagerPreview(logoPath);
+                } else {
+                    document.getElementById('logoManagerFileName').value = '';
+                    document.getElementById('logoManagerPreview').innerHTML = '<span style="color: #999;">Logo önizlemesi burada görünecek</span>';
+                }
+            });
+            
+            // Dosya adı değiştiğinde önizleme güncelle
+            const fileNameInput = document.getElementById('logoManagerFileName');
+            if (fileNameInput) {
+                fileNameInput.addEventListener('input', function() {
+                    const fileName = this.value.trim();
+                    if (fileName) {
+                        const logoPath = 'logos/' + fileName;
+                        updateLogoManagerPreview(logoPath);
+                    } else {
+                        document.getElementById('logoManagerPreview').innerHTML = '<span style="color: #999;">Logo önizlemesi burada görünecek</span>';
+                    }
+                });
+            }
+            
+            // Upload area'yı sıfırla
+            const uploadArea = document.getElementById('logoUploadArea');
+            if (uploadArea) {
+                uploadArea.innerHTML = `
+                    <input type="file" id="logoFileInput" accept="image/png,image/jpeg,image/jpg" style="display: none;" onchange="handleLogoFileSelect(event)">
+                    <div id="uploadAreaContent">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📤</div>
+                        <div style="color: #1a5f5f; font-weight: bold; margin-bottom: 5px;">Logo Dosyasını Sürükleyip Bırakın</div>
+                        <div style="color: #666; font-size: 13px;">veya tıklayarak seçin</div>
+                        <div style="color: #999; font-size: 12px; margin-top: 8px;">PNG, JPG formatları desteklenir</div>
+                    </div>
+                `;
+                uploadArea.onclick = function() {
+                    document.getElementById('logoFileInput').click();
+                };
+            }
+        }
+        
+        function closeLogoManager() {
+            const modal = document.getElementById('logoManagerModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Dosya Yükleme Fonksiyonları
+        function normalizeKey(str) {
+            return (str || '')
+                .toString()
+                .trim()
+                .toLowerCase()
+                .replace(/ı/g, 'i')
+                .replace(/İ/g, 'i')
+                .replace(/ş/g, 's')
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]+/g, '');
+        }
+
+        function baseNameFromPath(p) {
+            return ((p || '').split('/').pop()) || '';
+        }
+
+        function normalizeClubNameForMatch(clubName) {
+            // "Kulübü/Kulubu/Club" gibi ekleri kırp, kalanla normalize et
+            const s = (clubName || '')
+                .toString()
+                .trim()
+                .replace(/\bkulübü\b/ig, '')
+                .replace(/\bkulubu\b/ig, '')
+                .replace(/\bclub\b/ig, '')
+                .replace(/\bkulup\b/ig, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            return normalizeKey(s);
+        }
+
+        function findBestLogoBase64ForClub(fileBase64ByNormName, clubName, mappedPath) {
+            if (!fileBase64ByNormName) return null;
+
+            // 1) Mapping path dosya adına göre birebir
+            const mappedNorm = normalizeKey(baseNameFromPath(mappedPath).replace(/\.[^.]+$/, ''));
+            if (mappedNorm && fileBase64ByNormName[mappedNorm]) return fileBase64ByNormName[mappedNorm];
+
+            // 2) Kulüp adına göre birebir
+            const clubNorm = normalizeClubNameForMatch(clubName);
+            if (clubNorm && fileBase64ByNormName[clubNorm]) return fileBase64ByNormName[clubNorm];
+
+            // 3) "contains" eşleşme (en uzun ortak parça kazanır)
+            let bestKey = null;
+            let bestScore = 0;
+            const keys = Object.keys(fileBase64ByNormName);
+
+            for (const k of keys) {
+                if (!k) continue;
+                // mapping veya kulüp normu k'yi içeriyorsa veya tersi
+                const score =
+                    (mappedNorm && (k.includes(mappedNorm) || mappedNorm.includes(k)) ? Math.min(k.length, mappedNorm.length) : 0) +
+                    (clubNorm && (k.includes(clubNorm) || clubNorm.includes(k)) ? Math.min(k.length, clubNorm.length) : 0);
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestKey = k;
+                }
+            }
+
+            if (bestKey && bestScore >= 6) return fileBase64ByNormName[bestKey];
+            return null;
+        }
+
+        async function handleLogoFolderSelect(e) {
+            const files = Array.from(e.target.files || []);
+            const statusEl = document.getElementById('bulkImportStatus');
+            if (statusEl) statusEl.textContent = '';
+            if (!files.length) return;
+
+            const imageFiles = files.filter(f => (f.type || '').startsWith('image/'));
+            if (!imageFiles.length) {
+                alert('❌ Klasörde görsel bulunamadı (PNG/JPG).');
+                return;
+            }
+
+            if (statusEl) statusEl.textContent = `⏳ ${imageFiles.length} dosya okunuyor... (0/${imageFiles.length})`;
+
+            const fileBase64ByNormName = {};
+            // Seri oku: hem ilerleme göstermek hem de tarayıcıyı kilitlememek için
+            for (let i = 0; i < imageFiles.length; i++) {
+                const file = imageFiles[i];
+                // eslint-disable-next-line no-await-in-loop
+                await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result;
+                        const norm = normalizeKey(file.name.replace(/\.[^.]+$/, ''));
+                        if (typeof base64 === 'string' && base64.startsWith('data:')) {
+                            fileBase64ByNormName[norm] = base64;
+                        }
+                        resolve();
+                    };
+                    reader.onerror = () => resolve();
+                    reader.readAsDataURL(file);
+                });
+                if (statusEl && (i % 5 === 0 || i === imageFiles.length - 1)) {
+                    statusEl.textContent = `⏳ ${imageFiles.length} dosya okunuyor... (${i + 1}/${imageFiles.length})`;
+                }
+            }
+
+            let matched = 0;
+            let totalMapped = 0;
+            let correctedByName = 0;
+
+            Object.keys(clubLogoDatabase || {}).forEach((club) => {
+                const p = clubLogoDatabase[club];
+                if (!p || !p.startsWith('logos/')) return;
+                totalMapped++;
+                const base64 = findBestLogoBase64ForClub(fileBase64ByNormName, club, p);
+                if (base64) {
+                    // Eğer mapping dosya adına göre değil de kulüp adına göre bulunduysa say
+                    const mappedNorm = normalizeKey(baseNameFromPath(p).replace(/\.[^.]+$/, ''));
+                    const byMapped = mappedNorm && fileBase64ByNormName[mappedNorm] === base64;
+                    if (!byMapped) correctedByName++;
+                    clubLogoBase64Database[club] = base64;
+                    matched++;
+                }
+            });
+
+            // Header logoları (ÜÜ / SKS)
+            let uuOk = false;
+            let sksOk = false;
+            const uuKeys = ['uulogo', 'uu', 'uskudaruniversitesi', 'uskudar'];
+            const sksKeys = ['skslogo', 'sks'];
+
+            Object.keys(fileBase64ByNormName).forEach((norm) => {
+                if (!uuOk && uuKeys.some(k => norm.includes(k))) {
+                    localStorage.setItem('headerUULogoBase64', fileBase64ByNormName[norm]);
+                    uuOk = true;
+                }
+                if (!sksOk && sksKeys.some(k => norm.includes(k))) {
+                    localStorage.setItem('headerSKSLogoBase64', fileBase64ByNormName[norm]);
+                    sksOk = true;
+                }
+            });
+
+            // LocalStorage limiti aşılabilir → IndexedDB'ye yaz (kalıcı) + LocalStorage'ı best-effort dene
+            try {
+                localStorage.setItem('clubLogoBase64Database', JSON.stringify(clubLogoBase64Database));
+            } catch (e) {
+                // Beklenen: QUOTA_EXCEEDED_ERR
+                dwarn('LocalStorage base64 limiti aşıldı, IndexedDB kullanılacak:', e);
+            }
+            if (statusEl) statusEl.textContent = `⏳ Kaydediliyor... (IndexedDB)`;
+            try {
+                await persistBase64LogosToIDB();
+            } catch (e) {
+                alert('❌ Logo kaydı (IndexedDB) başarısız. Tarayıcı izinlerini kontrol edin.');
+                throw e;
+            }
+
+            displayLogoMappings();
+            if (statusEl) statusEl.textContent = `✅ Toplu içe aktarıldı: ${matched}/${totalMapped} kulüp (isimle düzeltme: ${correctedByName}) + ÜÜ=${uuOk ? 'OK' : '-'} / SKS=${sksOk ? 'OK' : '-'}`;
+
+            // Yeni base64 logoları mevcut etkinliklere uygula ve listeyi yenile
+            refreshEventLogosFromDatabase();
+            try { renderEvents(); } catch (_) {}
+
+            alert(`✅ Toplu içe aktarım tamamlandı!\n\nKulüp logoları (base64): ${matched}/${totalMapped}\nİsimle düzeltme: ${correctedByName}\nHeader: ÜÜ=${uuOk ? 'OK' : 'yok'} | SKS=${sksOk ? 'OK' : 'yok'}\n\nŞimdi “Tasarıma Dönüştür” → “Tasarımı İndir” deneyin.`);
+        }
+
+        function renderHeaderLogoManagerPreviews() {
+            const uuPreview = document.getElementById('headerUULogoPreview');
+            const sksPreview = document.getElementById('headerSKSLogoPreview');
+            if (!uuPreview || !sksPreview) return;
+
+            const uu = localStorage.getItem('headerUULogoBase64');
+            const sks = localStorage.getItem('headerSKSLogoBase64');
+
+            uuPreview.innerHTML = uu && uu.startsWith('data:')
+                ? `<img src="${uu}" alt="ÜÜ" style="width:100%; height:100%; object-fit:contain; display:block; background:white;">`
+                : `<span style="color:#999; font-size:12px;">ÜÜ</span>`;
+
+            sksPreview.innerHTML = sks && sks.startsWith('data:')
+                ? `<img src="${sks}" alt="SKS" style="width:100%; height:100%; object-fit:contain; display:block; background:white;">`
+                : `<span style="color:#999; font-size:12px;">SKS</span>`;
+        }
+
+        function handleHeaderLogoSelect(which, e) {
+            const file = e?.target?.files?.[0];
+            if (!file) return;
+            if (!(file.type || '').startsWith('image/')) {
+                alert('❌ Lütfen bir resim dosyası seçin (PNG/JPG).');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result;
+                if (typeof base64 !== 'string' || !base64.startsWith('data:')) {
+                    alert('❌ Logo okunamadı.');
+                    return;
+                }
+                if (which === 'uu') {
+                    localStorage.setItem('headerUULogoBase64', base64);
+                } else if (which === 'sks') {
+                    localStorage.setItem('headerSKSLogoBase64', base64);
+                }
+                renderHeaderLogoManagerPreviews();
+                alert('✅ Header logo kaydedildi! Şimdi “Tasarıma Dönüştür” yapabilirsiniz.');
+            };
+            reader.onerror = () => alert('❌ Logo okunamadı.');
+            reader.readAsDataURL(file);
+        }
+
+        function clearHeaderLogos() {
+            localStorage.removeItem('headerUULogoBase64');
+            localStorage.removeItem('headerSKSLogoBase64');
+            renderHeaderLogoManagerPreviews();
+            alert('✅ Header logoları temizlendi.');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const uploadArea = document.getElementById('logoUploadArea');
+            uploadArea.style.background = '#e7f3ff';
+            uploadArea.style.borderColor = '#1a5f5f';
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const uploadArea = document.getElementById('logoUploadArea');
+            uploadArea.style.background = '#f8f9fa';
+            uploadArea.style.borderColor = '#1a5f5f';
+        }
+        
+        function handleLogoDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const uploadArea = document.getElementById('logoUploadArea');
+            uploadArea.style.background = '#f8f9fa';
+            uploadArea.style.borderColor = '#1a5f5f';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processLogoFile(files[0]);
+            }
+        }
+        
+        function handleLogoFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processLogoFile(file);
+            }
+        }
+        
+        function processLogoFile(file) {
+            // Dosya tipi kontrolü
+            if (!file.type.startsWith('image/')) {
+                alert('❌ Lütfen bir resim dosyası seçin! (PNG, JPG)');
+                return;
+            }
+            
+            // Dosya boyutu kontrolü (500 KB)
+            if (file.size > 500 * 1024) {
+                alert('⚠️ Dosya boyutu çok büyük! Maksimum 500 KB olmalı.');
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Logo bilgilerini göster
+                    const logoInfo = document.getElementById('logoInfo');
+                    logoInfo.style.display = 'block';
+                    
+                    document.getElementById('logoSizeInfo').textContent = `${img.width} x ${img.height} px`;
+                    document.getElementById('logoFileSizeInfo').textContent = formatFileSize(file.size);
+                    document.getElementById('logoFormatInfo').textContent = file.type.split('/')[1].toUpperCase();
+                    
+                    const ratio = (img.width / img.height).toFixed(2);
+                    document.getElementById('logoRatioInfo').textContent = ratio + ':1';
+                    
+                    // Boyut uyarısı
+                    if (img.width !== img.height) {
+                        document.getElementById('logoRatioInfo').style.color = '#dc3545';
+                        document.getElementById('logoRatioInfo').innerHTML += ' ⚠️ (Kare değil)';
+                    } else {
+                        document.getElementById('logoRatioInfo').style.color = '#28a745';
+                    }
+                    
+                    if (img.width < 200 || img.height < 200) {
+                        document.getElementById('logoSizeInfo').style.color = '#dc3545';
+                        document.getElementById('logoSizeInfo').innerHTML += ' ⚠️ (Çok küçük)';
+                    } else if (img.width > 512 || img.height > 512) {
+                        document.getElementById('logoSizeInfo').style.color = '#ffc107';
+                        document.getElementById('logoSizeInfo').innerHTML += ' ⚠️ (Büyük)';
+                    } else {
+                        document.getElementById('logoSizeInfo').style.color = '#28a745';
+                    }
+                    
+                    // Önizleme göster
+                    const preview = document.getElementById('logoManagerPreview');
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Logo" style="max-width: 200px; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    `;
+                    
+                    // Base64'ü geçici olarak sakla (kaydet butonuna basıldığında kaydedilecek)
+                    const clubName = document.getElementById('logoManagerClubSelect').value;
+                    if (clubName) {
+                        // Base64'ü geçici olarak data attribute'da sakla
+                        document.getElementById('logoManagerClubSelect').dataset.tempBase64 = e.target.result;
+                        
+                        const suggestedName = generateFileNameFromClubName(clubName, file.name);
+                        document.getElementById('logoManagerFileName').value = suggestedName;
+                    } else {
+                        // Sadece dosya adını al (uzantıyı koru)
+                        const fileName = file.name.replace(/\s+/g, '-').toLowerCase();
+                        document.getElementById('logoManagerFileName').value = fileName;
+                        // Base64'ü geçici olarak sakla
+                        document.getElementById('logoManagerFileName').dataset.tempBase64 = e.target.result;
+                    }
+                    
+                    // Upload alanını güncelle
+                    const uploadArea = document.getElementById('logoUploadArea');
+                    uploadArea.innerHTML = `
+                        <div style="color: #28a745; font-weight: bold; margin-bottom: 10px;">✅ Dosya seçildi: ${file.name}</div>
+                        <div style="color: #666; font-size: 12px;">Yeni dosya yüklemek için tekrar tıklayın</div>
+                    `;
+                    uploadArea.onclick = function() {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/png,image/jpeg,image/jpg';
+                        input.style.display = 'none';
+                        input.onchange = handleLogoFileSelect;
+                        document.body.appendChild(input);
+                        input.click();
+                        document.body.removeChild(input);
+                    };
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        function generateFileNameFromClub() {
+            const clubName = document.getElementById('logoManagerClubSelect').value;
+            if (!clubName) {
+                alert('Lütfen önce bir kulüp seçin!');
+                return;
+            }
+            
+            const fileName = generateFileNameFromClubName(clubName);
+            document.getElementById('logoManagerFileName').value = fileName;
+        }
+        
+        function generateFileNameFromClubName(clubName, originalFileName = '') {
+            // Türkçe karakterleri değiştir
+            const turkishMap = {
+                'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+                'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u'
+            };
+            
+            let fileName = clubName
+                .toLowerCase()
+                .replace(/[çğıöşüÇĞİÖŞÜ]/g, (char) => turkishMap[char] || char)
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            // Eğer orijinal dosya adı varsa uzantısını al
+            if (originalFileName) {
+                const ext = originalFileName.split('.').pop().toLowerCase();
+                fileName += '.' + ext;
+            } else {
+                fileName += '.png';
+            }
+            
+            return fileName;
+        }
+        
+        function updateLogoManagerPreview(logoPath) {
+            const preview = document.getElementById('logoManagerPreview');
+            if (!preview) return;
+            
+            const encodedPath = encodeURI(logoPath);
+            preview.innerHTML = `
+                <img src="${encodedPath}" alt="Logo" style="max-width: 200px; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onload="this.onerror=null;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="color: #dc3545; display: none;">❌ Logo bulunamadı! Dosya adını kontrol edin veya logos/ klasörüne ekleyin.</span>
+            `;
+            
+            // Logo bilgilerini gizle (dosya yükleme ile gösterilir)
+            document.getElementById('logoInfo').style.display = 'none';
+        }
+        
+        function saveLogoMapping() {
+            const clubName = document.getElementById('logoManagerClubSelect').value;
+            const fileName = document.getElementById('logoManagerFileName').value.trim();
+            
+            if (!clubName) {
+                alert('Lütfen bir kulüp seçin!');
+                return;
+            }
+            
+            if (!fileName) {
+                alert('Lütfen logo dosya adını girin!');
+                return;
+            }
+            
+            // Logo path'ini oluştur
+            const logoPath = 'logos/' + fileName;
+            
+            // Veritabanına ekle/güncelle
+            clubLogoDatabase[clubName] = logoPath;
+            
+            // Base64 varsa kaydet (yüklenen dosyadan)
+            const clubSelect = document.getElementById('logoManagerClubSelect');
+            const fileNameInput = document.getElementById('logoManagerFileName');
+            const base64 = clubSelect.dataset.tempBase64 || fileNameInput.dataset.tempBase64;
+            
+            if (base64) {
+                clubLogoBase64Database[clubName] = base64;
+                // LocalStorage'a base64'ü kaydet
+                localStorage.setItem('clubLogoBase64Database', JSON.stringify(clubLogoBase64Database));
+                // Geçici base64'ü temizle
+                delete clubSelect.dataset.tempBase64;
+                delete fileNameInput.dataset.tempBase64;
+            }
+            
+            // LocalStorage'a kaydet
+            localStorage.setItem('clubLogoDatabase', JSON.stringify(clubLogoDatabase));
+            
+            alert(`✅ Logo eşleştirmesi kaydedildi!\n\nKulüp: ${clubName}\nLogo: ${logoPath}\n\n${base64 ? '📦 Logo base64 olarak da kaydedildi (GitHub Pages için)' : '💡 Logo dosyasını logos/ klasörüne eklemeyi unutmayın!'}`);
+            
+            // Listeyi güncelle
+            displayLogoMappings();
+            
+            // Logo preview'u güncelle
+            updateLogoPreview(clubName);
+        }
+        
+        // logos.json dosyasından logoları yükle (GitHub Pages için)
+        async function loadLogosFromJSON() {
+            try {
+                const response = await fetch('logos.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Kulüp listesini yükle
+                    if (data.clubNames && Array.isArray(data.clubNames) && data.clubNames.length > 0) {
+                        clubNames = [...new Set([...data.clubNames, ...clubNames])].sort();
+                        console.log(`✅ ${data.clubNames.length} kulüp logos.json'dan yüklendi`);
+                    }
+                    
+                    if (data.logos && Object.keys(data.logos).length > 0) {
+                        // Base64 logoları yükle (logos.json'dan gelenler öncelikli)
+                        Object.keys(data.logos).forEach(club => {
+                            if (data.logos[club]) {
+                                clubLogoBase64Database[club] = data.logos[club];
+                            }
+                        });
+                        console.log(`✅ ${Object.keys(data.logos).length} base64 logo yüklendi`);
+                    }
+                    if (data.mappings && Object.keys(data.mappings).length > 0) {
+                        // Logo eşleştirmelerini yükle (logos.json'dan gelenler öncelikli)
+                        Object.keys(data.mappings).forEach(club => {
+                            if (data.mappings[club]) {
+                                clubLogoDatabase[club] = data.mappings[club];
+                            }
+                        });
+                        console.log(`✅ ${Object.keys(data.mappings).length} logo eşleştirmesi yüklendi`);
+                    }
+
+                    // Header logolarını yükle (ÜÜ / SKS)
+                    if (data.header) {
+                        if (data.header.uu && typeof data.header.uu === 'string' && data.header.uu.startsWith('data:')) {
+                            localStorage.setItem('headerUULogoBase64', data.header.uu);
+                        }
+                        if (data.header.sks && typeof data.header.sks === 'string' && data.header.sks.startsWith('data:')) {
+                            localStorage.setItem('headerSKSLogoBase64', data.header.sks);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('ℹ️ logos.json dosyası bulunamadı (normal, ilk kullanımda olmayabilir)');
+            }
+        }
+        
+        // LocalStorage'dan logo veritabanını yükle
+        function loadLogoDatabase() {
+            // Önce başlangıç veritabanını koru, sonra LocalStorage'dan ekle
+            const saved = localStorage.getItem('clubLogoDatabase');
+            if (saved) {
+                try {
+                    const savedDatabase = JSON.parse(saved);
+                    // LocalStorage'dan gelen verileri ekle (sadece başlangıç veritabanında olmayanlar)
+                    Object.keys(savedDatabase).forEach(club => {
+                        // Eğer başlangıç veritabanında yoksa veya LocalStorage'daki path geçerliyse ekle
+                        if (savedDatabase[club] && (!clubLogoDatabase[club] || savedDatabase[club].startsWith('data:'))) {
+                            clubLogoDatabase[club] = savedDatabase[club];
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Logo veritabanı yüklenemedi:', e);
+                }
+            }
+            
+            // Base64 veritabanını yükle (LocalStorage'dan)
+            const savedBase64 = localStorage.getItem('clubLogoBase64Database');
+            if (savedBase64) {
+                try {
+                    const localBase64 = JSON.parse(savedBase64);
+                    // LocalStorage'dan gelen base64 logoları ekle
+                    Object.keys(localBase64).forEach(club => {
+                        if (localBase64[club]) {
+                            clubLogoBase64Database[club] = localBase64[club];
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Base64 logo veritabanı yüklenemedi:', e);
+                }
+            }
+        }
+        
+        // Logoları JSON dosyasına export et
+        function exportLogosToJSON() {
+            const exportData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                clubNames: clubNames,
+                logos: clubLogoBase64Database,
+                mappings: clubLogoDatabase,
+                header: {
+                    uu: localStorage.getItem('headerUULogoBase64') || null,
+                    sks: localStorage.getItem('headerSKSLogoBase64') || null
+                }
+            };
+            
+            const jsonString = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'logos.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            const headerUu = exportData.header.uu ? 'var' : 'yok';
+            const headerSks = exportData.header.sks ? 'var' : 'yok';
+            alert(`✅ logos.json dosyası indirildi!\n\n📦 İçerik:\n- ${clubNames.length} kulüp adı\n- ${Object.keys(clubLogoBase64Database).length} base64 logo\n- ${Object.keys(clubLogoDatabase).length} logo eşleştirmesi\n- Header ÜÜ: ${headerUu}\n- Header SKS: ${headerSks}\n\n📦 GitHub'a yükleme:\n1. İndirilen logos.json dosyasını ana dizine koyun\n2. GitHub repository'nize yükleyin\n3. Herkes aynı logoları ve kulüp listesini görebilecek!`);
+        }
+        
+        // Logo gösterim fonksiyonu - önce logos/ klasöründen dener, yoksa base64 kullanır
+        function getLogoSource(clubName) {
+            if (!clubName) {
+                return null;
+            }
+            
+            // Trim ve normalize et
+            const normalizedName = clubName.trim();
+            
+            // Önce base64 veritabanında kontrol et
+            if (clubLogoBase64Database && clubLogoBase64Database[normalizedName]) {
+                console.log('Base64 logo bulundu:', normalizedName);
+                return clubLogoBase64Database[normalizedName];
+            }
+            
+            // Sonra logo path veritabanında kontrol et (tam eşleşme)
+            if (clubLogoDatabase && clubLogoDatabase[normalizedName]) {
+                const logoPath = clubLogoDatabase[normalizedName];
+                console.log('Logo path bulundu (tam eşleşme):', normalizedName, '->', logoPath);
+                return logoPath;
+            }
+            
+            // Tam eşleşme yoksa, büyük/küçük harf duyarsız tam eşleşme dene
+            if (clubLogoDatabase) {
+                for (const key in clubLogoDatabase) {
+                    if (key.toLowerCase().trim() === normalizedName.toLowerCase().trim()) {
+                        const logoPath = clubLogoDatabase[key];
+                        console.log('Logo path bulundu (büyük/küçük harf duyarsız):', normalizedName, '->', key, '->', logoPath);
+                        return logoPath;
+                    }
+                }
+            }
+            
+            console.log('Logo bulunamadı:', normalizedName);
+            console.log('Mevcut kulüpler:', Object.keys(clubLogoDatabase || {}).slice(0, 10));
+            console.log('Aranan isim:', normalizedName);
+            
+            // Hiçbiri yoksa null döndür (emoji gösterilecek)
+            return null;
+        }
+
+        // Mevcut logo veritabanına göre etkinliklerdeki clubIcon alanını güncelle
+        // (Logo veritabanı sonradan değiştiğinde "liste" ile "tasarıma dönüştür" aynı logoyu kullansın)
+        function refreshEventLogosFromDatabase() {
+            try {
+                Object.values(events || {}).forEach(day => {
+                    if (!day || !Array.isArray(day.events)) return;
+                    day.events.forEach(ev => {
+                        if (!ev || !ev.clubName) return;
+                        const src = getLogoSource(ev.clubName);
+                        if (src) {
+                            ev.clubIcon = src;
+                        }
+                    });
+                });
+            } catch (_) {}
+        }
+        
+        function displayLogoMappings() {
+            const list = document.getElementById('logoMappingsList');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            
+            // Kulüp isimlerine göre sırala
+            const sortedClubs = Object.keys(clubLogoDatabase).sort();
+            
+            sortedClubs.forEach(club => {
+                const logoPath = clubLogoDatabase[club];
+                const fileName = logoPath.replace('logos/', '');
+                
+                const item = document.createElement('div');
+                item.style.cssText = 'padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;';
+                item.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; color: #1a5f5f; font-size: 13px;">${club}</div>
+                        <div style="color: #666; font-size: 11px; margin-top: 3px;">${fileName}</div>
+                    </div>
+                    <div style="width: 50px; height: 50px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-left: 10px; border: 1px solid #e0e0e0;">
+                        <img src="${encodeURI(logoPath)}" alt="Logo" style="max-width: 45px; max-height: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="font-size: 24px; display: none;">🎯</span>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        // Modal dışına tıklanınca kapat
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('logoManagerModal');
+            if (modal && e.target === modal) {
+                closeLogoManager();
+            }
+        });
+        
+        // Kulüp Yönetimi Fonksiyonları
+        function loadClubNames() {
+            const saved = localStorage.getItem('clubNames');
+            if (saved) {
+                try {
+                    const savedClubs = JSON.parse(saved);
+                    // Mevcut listeyle birleştir (savedClubs öncelikli)
+                    clubNames = [...new Set([...savedClubs, ...clubNames])].sort();
+                } catch (e) {
+                    console.warn('Kulüp listesi yüklenemedi:', e);
+                }
+            }
+        }
+        
+        function saveClubNames() {
+            localStorage.setItem('clubNames', JSON.stringify(clubNames));
+        }
+        
+        function showAddClubModal(editMode = false, oldName = '') {
+            const modal = document.getElementById('addClubModal');
+            const title = document.getElementById('addClubModalTitle');
+            const input = document.getElementById('newClubName');
+            
+            if (editMode) {
+                title.textContent = '✏️ Kulüp Düzenle';
+                input.value = oldName;
+                input.dataset.oldName = oldName;
+            } else {
+                title.textContent = '➕ Yeni Kulüp Ekle';
+                input.value = '';
+                delete input.dataset.oldName;
+            }
+            
+            modal.style.display = 'flex';
+            input.focus();
+        }
+        
+        function closeAddClubModal() {
+            document.getElementById('addClubModal').style.display = 'none';
+            document.getElementById('newClubName').value = '';
+        }
+        
+        function saveNewClub() {
+            const input = document.getElementById('newClubName');
+            const newName = input.value.trim();
+            const oldName = input.dataset.oldName;
+            
+            if (!newName) {
+                alert('❌ Lütfen kulüp adı girin!');
+                return;
+            }
+            
+            if (oldName) {
+                // Düzenleme modu
+                if (oldName === newName) {
+                    closeAddClubModal();
+                    return;
+                }
+                
+                // Eski adı yeni adla değiştir
+                const index = clubNames.indexOf(oldName);
+                if (index !== -1) {
+                    clubNames[index] = newName;
+                    
+                    // Logo veritabanını güncelle
+                    if (clubLogoDatabase[oldName]) {
+                        clubLogoDatabase[newName] = clubLogoDatabase[oldName];
+                        delete clubLogoDatabase[oldName];
+                    }
+                    if (clubLogoBase64Database[oldName]) {
+                        clubLogoBase64Database[newName] = clubLogoBase64Database[oldName];
+                        delete clubLogoBase64Database[oldName];
+                    }
+                    
+                    // LocalStorage'ı güncelle
+                    localStorage.setItem('clubLogoDatabase', JSON.stringify(clubLogoDatabase));
+                    localStorage.setItem('clubLogoBase64Database', JSON.stringify(clubLogoBase64Database));
+                    
+                    alert(`✅ Kulüp adı güncellendi!\n\nEski: ${oldName}\nYeni: ${newName}`);
+                }
+            } else {
+                // Yeni ekleme modu
+                if (clubNames.includes(newName)) {
+                    alert('⚠️ Bu kulüp zaten listede var!');
+                    return;
+                }
+                
+                clubNames.push(newName);
+                clubNames.sort();
+                alert(`✅ Yeni kulüp eklendi: ${newName}`);
+            }
+            
+            saveClubNames();
+            closeAddClubModal();
+            
+            // Logo yönetim panelini yenile
+            if (document.getElementById('logoManagerModal').style.display === 'flex') {
+                openLogoManager();
+            }
+            
+            // Ana formu yenile
+            initClubList();
+        }
+        
+        function editSelectedClub() {
+            const select = document.getElementById('logoManagerClubSelect');
+            const selectedClub = select.value;
+            
+            if (!selectedClub) {
+                alert('❌ Lütfen düzenlemek için bir kulüp seçin!');
+                return;
+            }
+            
+            showAddClubModal(true, selectedClub);
+        }
+        
+        function deleteSelectedClub() {
+            const select = document.getElementById('logoManagerClubSelect');
+            const selectedClub = select.value;
+            
+            if (!selectedClub) {
+                alert('❌ Lütfen silmek için bir kulüp seçin!');
+                return;
+            }
+            
+            if (!confirm(`⚠️ "${selectedClub}" kulübünü silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!`)) {
+                return;
+            }
+            
+            // Kulüp listesinden sil
+            const index = clubNames.indexOf(selectedClub);
+            if (index !== -1) {
+                clubNames.splice(index, 1);
+                saveClubNames();
+            }
+            
+            // Logo veritabanından sil (opsiyonel - kullanıcıya sor)
+            if (clubLogoDatabase[selectedClub] || clubLogoBase64Database[selectedClub]) {
+                if (confirm('Logo verilerini de silmek ister misiniz?')) {
+                    delete clubLogoDatabase[selectedClub];
+                    delete clubLogoBase64Database[selectedClub];
+                    localStorage.setItem('clubLogoDatabase', JSON.stringify(clubLogoDatabase));
+                    localStorage.setItem('clubLogoBase64Database', JSON.stringify(clubLogoBase64Database));
+                }
+            }
+            
+            alert(`✅ "${selectedClub}" kulübü silindi!`);
+            
+            // Logo yönetim panelini yenile
+            if (document.getElementById('logoManagerModal').style.display === 'flex') {
+                openLogoManager();
+            }
+            
+            // Ana formu yenile
+            initClubList();
+        }
+        
+        // Modal dışına tıklanınca kapat
+        document.addEventListener('click', (e) => {
+            const addClubModal = document.getElementById('addClubModal');
+            if (addClubModal && e.target === addClubModal) {
+                closeAddClubModal();
+            }
+        });
+        
+        window.onload = async function() {
+            // Önce logos.json dosyasından yükle (GitHub Pages için)
+            await loadLogosFromJSON();
+            
+            // Sonra LocalStorage'dan yükle (kullanıcı özel logoları için)
+            loadLogoDatabase();
+
+            // Büyük base64 setleri için IndexedDB'den de yükle
+            await loadBase64LogosFromIDB();
+            
+            // Kulüp listesini yükle
+            loadClubNames();
+            
+            initClubList();
+            setupClubAutoSelect();
+            initTimeSelector();
+
+            // Yükleme sonrası mevcut etkinlikler varsa logoları güncelle ve listeyi yenile
+            refreshEventLogosFromDatabase();
+            try { renderEvents(); } catch (_) {}
+        };
+    </script>
+</body>
+</html>

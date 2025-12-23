@@ -1,0 +1,332 @@
+{
+  "startDate": "22 ARALIK",
+  "endDate": "28 ARALIK",
+  "year": "2025",
+  "days": [
+    {
+      "dayName": "Pazartesi",
+      "date": "22 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "Genç Yeryüzü Doktorları Kulübü",
+          "clubIcon": "🩺",
+          "eventTitle": "Yeryüzüne Dokun",
+          "time": "10:00",
+          "location": "Sultanbeyli Yunus Emre Ortaokulu",
+          "isOnline": false
+        },
+        {
+          "clubName": "Geleceğin Liderleri Kulübü",
+          "clubIcon": "👔",
+          "eventTitle": "Siyaset Akademisi",
+          "time": "12:00",
+          "location": "Fuat Sezgin Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Üsküdar Üniversitesi Tarih Kulübü",
+          "clubIcon": "📜",
+          "eventTitle": "Timur Bayezid Çekişmesi Ve Ankara Savaşı",
+          "time": "14:00",
+          "location": "Sokrates Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Perfüzyon Kulübü",
+          "clubIcon": "💉",
+          "eventTitle": "Mülakat Etkinliği",
+          "time": "14:00",
+          "location": "ZOOM Çevrimiçi",
+          "isOnline": true
+        },
+        {
+          "clubName": "Tarih ve Kültür Kulübü",
+          "clubIcon": "🏛️",
+          "eventTitle": "Vefa Ziyaretleri Serisi - 1",
+          "time": "14:30",
+          "location": "Karacaahmet Mezarlığı",
+          "isOnline": false
+        }
+      ]
+    },
+    {
+      "dayName": "Salı",
+      "date": "23 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "Intercultural Kulübü",
+          "clubIcon": "🌍",
+          "eventTitle": "International Breakfast - Filistin İçin Dayanışma",
+          "time": "11:00",
+          "location": "Lobi, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Sessizliği Boz Kulübü",
+          "clubIcon": "🐾",
+          "eventTitle": "Hayvan Barınağı Ziyareti",
+          "time": "13:00",
+          "location": "Kadıköy Hayvan Barınağı",
+          "isOnline": false
+        },
+        {
+          "clubName": "STEM Projects Kulübü",
+          "clubIcon": "🔬",
+          "eventTitle": "Board Yapma Etkinliği",
+          "time": "13:00",
+          "location": "A Blok 306, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "İlk ve Acil Yardım Kulübü",
+          "clubIcon": "🚑",
+          "eventTitle": "Paramedik Mesleği Ve Sahadan Notlar",
+          "time": "14:00",
+          "location": "Emir Nebi 2, Çarşı Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Yeşilay Kulübü",
+          "clubIcon": "🌿",
+          "eventTitle": "Gönülden Sesler: Sıra Gecesi",
+          "time": "16:00",
+          "location": "Sokrates Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        }
+      ]
+    },
+    {
+      "dayName": "Çarşamba",
+      "date": "24 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "Sosyoloji Kulübü",
+          "clubIcon": "📚",
+          "eventTitle": "Film Gösterimi",
+          "time": "11:30",
+          "location": "Eflatun Adam Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Üsküdar Üniversitesi Cansağlığı Kulübü",
+          "clubIcon": "🧠",
+          "eventTitle": "Hedef Belirleme Atölyesi",
+          "time": "13:00",
+          "location": "A blok-1-13, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Üsküdar Çeviri Kulübü",
+          "clubIcon": "🌐",
+          "eventTitle": "Medikal Çeviri Söyleşisi",
+          "time": "14:00",
+          "location": "Eflatun Adam Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Genç Gönüllüler Kulübü",
+          "clubIcon": "❤️",
+          "eventTitle": "Vision Board Atölyesi",
+          "time": "14:30",
+          "location": "Sokrates Salonu, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Teknoloji ve İnovasyon Kulübü",
+          "clubIcon": "💻",
+          "eventTitle": "Artı Bir Deneyim",
+          "time": "15:30",
+          "location": "Kuleli Salonu, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Perfüzyon Kulübü",
+          "clubIcon": "💉",
+          "eventTitle": "Sinema Etkinliği",
+          "time": "17:30",
+          "location": "İbni Sina Salonu, Sağlık Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Üsküdar Çeviri Kulübü",
+          "clubIcon": "🌐",
+          "eventTitle": "Genç Çevirmenler Serisi-1",
+          "time": "18:00",
+          "location": "ZOOM Çevrimiçi",
+          "isOnline": true
+        }
+      ]
+    },
+    {
+      "dayName": "Perşembe",
+      "date": "25 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "Sağlık Yönetimi Kulübü",
+          "clubIcon": "🏥",
+          "eventTitle": "Oryantasyon Eğitimi",
+          "time": "10:00",
+          "location": "Erenköy Fizik Tedavi ve Rehabilitasyon Hastanesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Senaryo Bazlı İSG Uygulamaları Kulübü",
+          "clubIcon": "⚠️",
+          "eventTitle": "Avrasya Tüneli İşletmesi Teknik Gezi",
+          "time": "10:00",
+          "location": "Barbaros, Üsküdar",
+          "isOnline": false
+        },
+        {
+          "clubName": "Fizyoterapi Kulübü",
+          "clubIcon": "🏃",
+          "eventTitle": "Çocuklukta Normal Motor Gelişimi",
+          "time": "11:00",
+          "location": "Emir Nebi-2, Çarşı Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Lösemili Çocuklara Fayda Kulübü",
+          "clubIcon": "🎗️",
+          "eventTitle": "Lösev İyi Şeyler Dükkanı",
+          "time": "12:00",
+          "location": "Lobi, Çarşı Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Gazetecilik Kulübü",
+          "clubIcon": "📰",
+          "eventTitle": "Vision Board Atölyesi",
+          "time": "14:30",
+          "location": "D Blok 4. kat Toplantı Salonu, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Çağın Vicdanı Kulübü",
+          "clubIcon": "🤝",
+          "eventTitle": "Gençlik Bir Kere Yaşanır",
+          "time": "15:00",
+          "location": "Emir Nebi-1, Çarşı Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Perfüzyon Kulübü",
+          "clubIcon": "💉",
+          "eventTitle": "Aylık Bilimsel Toplantı",
+          "time": "18:00",
+          "location": "İbni Sina Salonu, Sağlık Yerleşkesi",
+          "isOnline": false
+        }
+      ]
+    },
+    {
+      "dayName": "Cuma",
+      "date": "26 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "Hemşirelik Kulübü",
+          "clubIcon": "👩‍⚕️",
+          "eventTitle": "Hemşirelik Öğrencileri Sempozyumu",
+          "time": "08:45",
+          "location": "İbni Sina Salonu, Sağlık Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Senaryo Bazlı İsg Uygulamaları Kulübü",
+          "clubIcon": "⚠️",
+          "eventTitle": "Prosense Teknik Gezi",
+          "time": "10:00",
+          "location": "Prosense - Kartal",
+          "isOnline": false
+        },
+        {
+          "clubName": "Dil ve Konuşma Terapisi Kulübü",
+          "clubIcon": "🗣️",
+          "eventTitle": "Şakire Hanım Özel Eğitim Uygulama Okulu Ziyareti",
+          "time": "10:00",
+          "location": "Ümraniye",
+          "isOnline": false
+        },
+        {
+          "clubName": "Lösemili Çocuklara Fayda Kulübü",
+          "clubIcon": "🎗️",
+          "eventTitle": "Lösev İyi Şeyler Dükkanı",
+          "time": "12:00",
+          "location": "Lobi, Sağlık Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Sürdürülebilir Kalkınma Kulübü",
+          "clubIcon": "🌱",
+          "eventTitle": "Üsküdargo Geleceğin Girişimcileri Üsküdar'da",
+          "time": "09:30",
+          "location": "Emirnebi-1, Emirnebi-2, Çarşı Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Sessizliği Boz Kulübü",
+          "clubIcon": "🐾",
+          "eventTitle": "Sevgi Evi Ziyareti",
+          "time": "13:00",
+          "location": "Semiha Şakir Çocuk Evleri Sitesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Üsküdar Üniversitesi Spor Kulübü",
+          "clubIcon": "⚽",
+          "eventTitle": "Hankando Semineri",
+          "time": "14:00",
+          "location": "Ayhan Songar Salonu, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Tarih ve Kültür Kulübü",
+          "clubIcon": "🏛️",
+          "eventTitle": "Kitap İncelemesi",
+          "time": "14:00",
+          "location": "A Blok 202, Güney Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Teknoloji ve İnovasyon Kulübü",
+          "clubIcon": "💻",
+          "eventTitle": "Artı Bir Deneyim",
+          "time": "15:30",
+          "location": "Kuleli Salonu, Merkez Yerleşkesi",
+          "isOnline": false
+        },
+        {
+          "clubName": "Adli Bilimler Ve Ceza Adaleti Kulübü",
+          "clubIcon": "🔍",
+          "eventTitle": "Travmanın Anatomisi: Her Yaralanma Bir Hikaye Anlatır",
+          "time": "15:30",
+          "location": "Aziz Sancar Salonu, Merkez Yerleşkesi",
+          "isOnline": false
+        }
+      ]
+    },
+    {
+      "dayName": "Cumartesi",
+      "date": "27 ARALIK 2025",
+      "events": [
+        {
+          "clubName": "İyiliğin Geleceği Kulübü",
+          "clubIcon": "✨",
+          "eventTitle": "Kitap Tahlili-2",
+          "time": "13:30",
+          "location": "Meva Kafe-Üsküdar",
+          "isOnline": false
+        },
+        {
+          "clubName": "Dil ve Konuşma Terapisi Kulübü",
+          "clubIcon": "🗣️",
+          "eventTitle": "Kupa Bez Çanta Workshop",
+          "time": "14:00",
+          "location": "Eye Opia Moda",
+          "isOnline": false
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-01-01T00:00:00.000Z",
+  "clubNames": [
+    "Genç Yeryüzü Doktorları Kulübü"
+  ],
+  "logos": {
+    "Genç Yeryüzü Doktorları Kulübü": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+  },
+  "mappings": {
+    "Genç Yeryüzü Doktorları Kulübü": "logos/genç yer yüzü doktorları.png"
+  },
+  "header": {
+    "uu": null,
+    "sks": null
+  }
+}
+

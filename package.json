@@ -1,0 +1,19 @@
+{
+  "name": "uskudar-email-generator",
+  "version": "1.0.0",
+  "description": "Üsküdar Üniversitesi haftalık etkinlik programı e-posta otomatik tasarım sistemi",
+  "main": "generate-email.js",
+  "scripts": {
+    "generate": "node generate-email.js",
+    "test": "node generate-email.js"
+  },
+  "keywords": [
+    "email",
+    "template",
+    "newsletter",
+    "uskudar"
+  ],
+  "author": "",
+  "license": "ISC"
+}
+
