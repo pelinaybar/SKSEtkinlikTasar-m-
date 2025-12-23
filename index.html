@@ -474,6 +474,9 @@
             <div class="button-group" style="margin-top: 30px; justify-content: center;">
                 <button class="btn btn-success" onclick="convertToDesign()" style="background: #28a745; padding: 12px 30px; font-size: 16px;">🎨 Tasarıma Dönüştür</button>
                 <button class="btn btn-primary" onclick="downloadDesign()" id="downloadBtn" style="display: none; background: #1a5f5f;">💾 Tasarımı İndir</button>
+                <button class="btn btn-info" onclick="exportEventsToJSON()" style="background:#17a2b8; color:white;">📤 Etkinlikleri JSON'a Aktar</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('eventsJsonInput').click()" style="background:#6c757d; color:white;">📥 JSON'dan Etkinlik Yükle</button>
+                <input type="file" id="eventsJsonInput" accept="application/json" style="display:none;" onchange="importEventsFromJSONFile(event)">
             </div>
             
             <!-- Logo Yönetimi -->
@@ -1138,6 +1141,92 @@
                 el.addEventListener('input', () => scheduleSaveEventsState());
                 el.addEventListener('change', () => scheduleSaveEventsState());
             });
+        }
+
+        // Paylaşımlı kullanım için: repoya konan events-data.json'dan etkinlikleri yükle (varsa)
+        async function loadEventsFromJSON() {
+            try {
+                const res = await fetch('events-data.json', { cache: 'no-store' });
+                if (!res.ok) return false;
+                const data = await res.json();
+                if (!data || typeof data !== 'object') return false;
+
+                // Beklenen format:
+                // { version, exportDate, week: {startDate,endDate}, events: { [day]: {date, isoDate, events: [...] } } }
+                if (data.week) setWeekStateToInputs(data.week);
+                if (data.dayDateISO && typeof data.dayDateISO === 'object') {
+                    Object.keys(data.dayDateISO).forEach((k) => {
+                        dayDateISO[k] = data.dayDateISO[k];
+                    });
+                }
+                if (data.events && typeof data.events === 'object') {
+                    events = data.events;
+                    hydrateEventsAfterLoad();
+                    return true;
+                }
+                return false;
+            } catch (_) {
+                // Dosya yoksa normal
+                return false;
+            }
+        }
+
+        function exportEventsToJSON() {
+            try {
+                const payload = {
+                    version: 1,
+                    exportDate: new Date().toISOString(),
+                    week: getWeekStateFromInputs(),
+                    dayDateISO: { ...dayDateISO },
+                    events: serializeEventsForStorage(events)
+                };
+                const jsonString = JSON.stringify(payload, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'events-data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('✅ events-data.json indirildi!\n\nİpucu: GitHub Pages için bu dosyayı repo kök dizinine koyup push edebilirsiniz.');
+            } catch (e) {
+                alert('❌ JSON dışa aktarma hatası: ' + (e?.message || e));
+            }
+        }
+
+        async function importEventsFromJSONFile(e) {
+            try {
+                const file = e?.target?.files?.[0];
+                if (!file) return;
+                const text = await file.text();
+                const data = JSON.parse(text);
+                if (!data || typeof data !== 'object' || !data.events || typeof data.events !== 'object') {
+                    alert('❌ Geçersiz JSON formatı.');
+                    return;
+                }
+
+                // Var olanları değiştir (import = restore)
+                events = data.events;
+                if (data.week) setWeekStateToInputs(data.week);
+                if (data.dayDateISO && typeof data.dayDateISO === 'object') {
+                    Object.keys(data.dayDateISO).forEach((k) => {
+                        dayDateISO[k] = data.dayDateISO[k];
+                    });
+                }
+
+                hydrateEventsAfterLoad();
+                refreshEventLogosFromDatabase();
+                renderEvents();
+                saveEventsStateNow();
+                alert('✅ Etkinlikler JSON’dan yüklendi!');
+            } catch (err) {
+                alert('❌ JSON içe aktarma hatası: ' + (err?.message || err));
+            } finally {
+                // Aynı dosyayı tekrar seçebilmek için temizle
+                try { e.target.value = ''; } catch (_) {}
+            }
         }
 
         // Debug logları (production'da kapalı)
@@ -3578,6 +3667,9 @@
         window.onload = async function() {
             // Önce logos.json dosyasından yükle (GitHub Pages için)
             await loadLogosFromJSON();
+
+            // Paylaşımlı kullanım: varsa events-data.json'dan yükle (seed)
+            await loadEventsFromJSON();
             
             // Sonra LocalStorage'dan yükle (kullanıcı özel logoları için)
             loadLogoDatabase();
