@@ -1681,7 +1681,7 @@
                             </div>
                             
                             <!-- Events Grid -->
-                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
                                 ${events[day].events.map(event => {
                                     const locationIcon = event.isOnline ? '🌐' : '📍';
                                     const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
