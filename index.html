@@ -2512,6 +2512,7 @@
             dayOrder.forEach(day => {
                 if (events[day] && events[day].events.length > 0) {
                     const dayColor = dayColors[day];
+                    const cols = Math.max(1, Math.min(5, events[day].events.length));
                     html += `
                         <div style="margin-top: 20px;">
                             <!-- Day Header -->
@@ -2520,7 +2521,7 @@
                             </div>
                             
                             <!-- Events Grid -->
-                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
+                            <div style="background: ${dayColor.light}; padding: 15px; border-radius: 0 0 6px 6px; display: grid; grid-template-columns: repeat(${cols}, minmax(0, 1fr)); gap: 12px;">
                                 ${events[day].events.map(event => {
                                     const locationIcon = event.isOnline ? '🌐' : '📍';
                                     const locationColor = event.isOnline ? '#ff6b6b' : '#4a90e2';
