@@ -496,8 +496,20 @@
                         <input id="supabaseAnonKey" type="password" placeholder="eyJhbGciOi..." style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
                     </div>
                 </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div>
+                        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Admin Email</div>
+                        <input id="supabaseEmail" type="email" placeholder="ornek@uskudar.edu.tr" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
+                    </div>
+                    <div>
+                        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Şifre</div>
+                        <input id="supabasePassword" type="password" placeholder="••••••••" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
+                    </div>
+                </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; align-items:center;">
                     <button class="btn btn-info" onclick="saveSupabaseConfig()" style="background:#0d6efd; color:white;">💾 Ayarları Kaydet</button>
+                    <button class="btn btn-primary" onclick="supabaseAuthLogin()" style="background:#0b5ed7; color:white;">🔐 Giriş</button>
+                    <button class="btn btn-secondary" onclick="supabaseAuthLogout()" style="background:#adb5bd; color:#1b1f23;">🚪 Çıkış</button>
                     <button class="btn btn-secondary" onclick="cloudPullEvents()" style="background:#6c757d; color:white;">⬇️ Buluttan Çek</button>
                     <button class="btn btn-success" onclick="cloudPushEvents()" style="background:#198754; color:white;">⬆️ Buluta Gönder</button>
                     <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#234; padding:6px 10px; background:#fff; border-radius:8px; border:1px solid #cfe2ff;">
@@ -505,6 +517,7 @@
                         Otomatik senkron
                     </label>
                     <span id="cloudSyncStatus" style="font-size:12px; color:#234; opacity:0.9;"></span>
+                    <span id="cloudAuthStatus" style="font-size:12px; color:#234; opacity:0.9;"></span>
                 </div>
             </div>
             
@@ -1065,6 +1078,7 @@
             anon: 'sks_supabase_anon',
             auto: 'sks_supabase_auto_sync'
         };
+        const CLOUD_SESSION_KEY = 'sks_supabase_session_v1';
 
         function setCloudStatus(text) {
             const el = document.getElementById('cloudSyncStatus');
@@ -1076,6 +1090,119 @@
             const anonKey = (localStorage.getItem(CLOUD_CFG_KEYS.anon) || '').trim();
             const auto = (localStorage.getItem(CLOUD_CFG_KEYS.auto) || 'false') === 'true';
             return { url, anonKey, auto };
+        }
+
+        function getSupabaseSession() {
+            try {
+                const raw = localStorage.getItem(CLOUD_SESSION_KEY);
+                if (!raw) return null;
+                const s = JSON.parse(raw);
+                if (!s || typeof s !== 'object') return null;
+                return s;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function setSupabaseSession(session) {
+            if (!session) {
+                localStorage.removeItem(CLOUD_SESSION_KEY);
+                return;
+            }
+            localStorage.setItem(CLOUD_SESSION_KEY, JSON.stringify(session));
+        }
+
+        function updateCloudAuthStatusUI() {
+            const s = getSupabaseSession();
+            const status = s?.email ? `👤 Giriş: ${s.email}` : '👤 Giriş yapılmadı';
+            const el = document.getElementById('cloudAuthStatus');
+            if (el) el.textContent = status;
+        }
+
+        async function supabaseAuthLogin() {
+            const cfg = getSupabaseConfig();
+            if (!cfg.url || !cfg.anonKey) {
+                alert('❌ Önce Supabase URL ve Anon Key girip kaydedin.');
+                return;
+            }
+            const email = (document.getElementById('supabaseEmail')?.value || '').trim();
+            const password = (document.getElementById('supabasePassword')?.value || '').trim();
+            if (!email || !password) {
+                alert('❌ Email ve şifre gerekli.');
+                return;
+            }
+            try {
+                setCloudStatus('🔐 Giriş yapılıyor...');
+                const url = cfg.url.replace(/\/+$/, '') + '/auth/v1/token?grant_type=password';
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        apikey: cfg.anonKey,
+                        Authorization: `Bearer ${cfg.anonKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) {
+                    throw new Error(data?.error_description || data?.msg || data?.message || 'Giriş başarısız');
+                }
+                const now = Math.floor(Date.now() / 1000);
+                setSupabaseSession({
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token,
+                    expires_at: now + (data.expires_in || 3600),
+                    email: data.user?.email || email,
+                    user_id: data.user?.id || null
+                });
+                updateCloudAuthStatusUI();
+                setCloudStatus('✅ Giriş başarılı.');
+            } catch (e) {
+                console.error(e);
+                setCloudStatus('❌ Giriş başarısız.');
+                alert('❌ Supabase giriş hatası: ' + (e?.message || e));
+            }
+        }
+
+        async function supabaseAuthRefreshIfNeeded() {
+            const cfg = getSupabaseConfig();
+            const s = getSupabaseSession();
+            if (!cfg.url || !cfg.anonKey || !s?.refresh_token) return null;
+            const now = Math.floor(Date.now() / 1000);
+            if (s.expires_at && s.expires_at - now > 60 && s.access_token) return s.access_token;
+            try {
+                const url = cfg.url.replace(/\/+$/, '') + '/auth/v1/token?grant_type=refresh_token';
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        apikey: cfg.anonKey,
+                        Authorization: `Bearer ${cfg.anonKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refresh_token: s.refresh_token })
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) throw new Error(data?.error_description || 'Token yenilenemedi');
+                const now2 = Math.floor(Date.now() / 1000);
+                setSupabaseSession({
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token || s.refresh_token,
+                    expires_at: now2 + (data.expires_in || 3600),
+                    email: data.user?.email || s.email || '',
+                    user_id: data.user?.id || s.user_id || null
+                });
+                updateCloudAuthStatusUI();
+                return data.access_token;
+            } catch (e) {
+                console.warn('Token refresh hatası:', e);
+                return null;
+            }
+        }
+
+        async function supabaseAuthLogout() {
+            setSupabaseSession(null);
+            updateCloudAuthStatusUI();
+            setCloudStatus('👋 Çıkış yapıldı.');
         }
 
         function saveSupabaseConfig() {
@@ -1096,31 +1223,47 @@
             setCloudStatus(checked ? '🔁 Otomatik senkron açık' : '⏸️ Otomatik senkron kapalı');
         }
 
-        function getWeekKeyForCloud() {
-            const w = getWeekStateFromInputs();
+        // "Mevcut hafta" state'i: hafta değişiminde eski haftayı doğru anahtarla kaydetmek için.
+        let currentWeekState = { startDate: '', endDate: '' };
+        let currentWeekKey = 'week_default';
+
+        function computeWeekKey(weekState) {
+            const w = weekState || {};
             const base = `${w.startDate || ''}_${w.endDate || ''}`.trim();
             const key = normalizeKey(base) || 'default';
             return `week_${key}`;
         }
 
-        function getWeekKeyForLocal() {
-            // Cloud ile aynı mantıkta, ama local key prefix'i farklı
-            return getWeekKeyForCloud();
+        function getWeekKeyForCloud(weekState = currentWeekState) {
+            return computeWeekKey(weekState);
+        }
+
+        function getWeekKeyForLocal(weekState = currentWeekState) {
+            return computeWeekKey(weekState);
+        }
+
+        function getLocalEventsStorageKeyForWeekKey(weekKey) {
+            return EVENTS_STORAGE_KEY_PREFIX + (weekKey || 'week_default');
         }
 
         function getLocalEventsStorageKey() {
-            return EVENTS_STORAGE_KEY_PREFIX + getWeekKeyForLocal();
+            return getLocalEventsStorageKeyForWeekKey(currentWeekKey);
         }
 
         async function supabaseRequest(path, { method = 'GET', headers = {}, body } = {}) {
             const cfg = getSupabaseConfig();
             if (!cfg.url || !cfg.anonKey) throw new Error('Supabase ayarları eksik.');
+            const needsAuth = method && method.toUpperCase() !== 'GET';
+            const token = await supabaseAuthRefreshIfNeeded();
+            if (needsAuth && !token) {
+                throw new Error('Buluta yazmak için Supabase ile giriş yapın (email/şifre).');
+            }
             const url = cfg.url.replace(/\/+$/, '') + path;
             const res = await fetch(url, {
                 method,
                 headers: {
                     apikey: cfg.anonKey,
-                    Authorization: `Bearer ${cfg.anonKey}`,
+                    Authorization: `Bearer ${token || cfg.anonKey}`,
                     'Content-Type': 'application/json',
                     ...headers
                 },
@@ -1144,11 +1287,13 @@
                 const payload = {
                     version: 1,
                     savedAt: new Date().toISOString(),
-                    week: getWeekStateFromInputs(),
+                    week: { ...currentWeekState },
                     dayDateISO: { ...dayDateISO },
                     events: serializeEventsForStorage(events)
                 };
-                const body = [{ week_key, payload }];
+                // RLS açıkken yazmak için owner_id gerekir (auth.uid() ile eşleşecek).
+                const owner_id = getSupabaseSession()?.user_id || null;
+                const body = [{ week_key, payload, owner_id }];
                 await supabaseRequest(`/rest/v1/events_state`, {
                     method: 'POST',
                     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
@@ -1188,6 +1333,9 @@
 
                 const payload = row.payload;
                 if (payload.week) setWeekStateToInputs(payload.week);
+                // Haftayı "mevcut hafta" olarak set et
+                currentWeekState = payload.week || getWeekStateFromInputs();
+                currentWeekKey = computeWeekKey(currentWeekState);
                 if (payload.dayDateISO && typeof payload.dayDateISO === 'object') {
                     Object.keys(payload.dayDateISO).forEach((k) => { dayDateISO[k] = payload.dayDateISO[k]; });
                 }
@@ -1359,18 +1507,21 @@
             } catch (_) {}
         }
 
-        function saveEventsStateNow() {
+        function saveEventsStateNow(options = {}) {
             try {
+                const weekKey = options.weekKey || currentWeekKey;
+                const weekState = options.weekState || currentWeekState;
+                const skipCloud = options.skipCloud === true;
                 const payload = {
                     version: 1,
                     savedAt: new Date().toISOString(),
-                    week: getWeekStateFromInputs(),
+                    week: { ...weekState },
                     dayDateISO: { ...dayDateISO },
                     events: serializeEventsForStorage(events)
                 };
-                localStorage.setItem(getLocalEventsStorageKey(), JSON.stringify(payload));
-                localStorage.setItem(EVENTS_LAST_WEEK_KEY, getWeekKeyForLocal());
-                scheduleCloudPush();
+                localStorage.setItem(getLocalEventsStorageKeyForWeekKey(weekKey), JSON.stringify(payload));
+                localStorage.setItem(EVENTS_LAST_WEEK_KEY, weekKey);
+                if (!skipCloud) scheduleCloudPush();
             } catch (e) {
                 console.warn('Etkinlikler kaydedilemedi:', e);
             }
@@ -1381,23 +1532,25 @@
             _eventsSaveTimer = setTimeout(saveEventsStateNow, 300);
         }
 
-        function loadEventsStateFromStorage() {
+        function loadEventsStateFromStorage(weekKey = currentWeekKey) {
             try {
                 // Önce bu hafta key'i ile yükle
-                let raw = localStorage.getItem(getLocalEventsStorageKey());
+                let raw = localStorage.getItem(getLocalEventsStorageKeyForWeekKey(weekKey));
                 // Eski tekil key’den migration (varsa)
                 if (!raw) {
                     const legacy = localStorage.getItem('sks_events_state_v1');
                     if (legacy) {
                         raw = legacy;
                         // Bu haftaya kopyala (ilk geçiş)
-                        localStorage.setItem(getLocalEventsStorageKey(), legacy);
+                        localStorage.setItem(getLocalEventsStorageKeyForWeekKey(weekKey), legacy);
                     }
                 }
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
                 if (!parsed || typeof parsed !== 'object') return false;
                 if (parsed.week) setWeekStateToInputs(parsed.week);
+                currentWeekState = parsed.week || getWeekStateFromInputs();
+                currentWeekKey = computeWeekKey(currentWeekState);
                 if (parsed.dayDateISO && typeof parsed.dayDateISO === 'object') {
                     Object.keys(parsed.dayDateISO).forEach((k) => {
                         dayDateISO[k] = parsed.dayDateISO[k];
@@ -1442,9 +1595,18 @@
         }
 
         function onWeekInputsChanged() {
-            // Önce mevcut haftayı kaydet, sonra yeni haftaya geç
-            try { saveEventsStateNow(); } catch (_) {}
+            // Önce mevcut haftayı (old key) lokal’e kaydet, sonra yeni haftaya geç
+            const prevKey = currentWeekKey;
+            const prevState = { ...currentWeekState };
+            try { saveEventsStateNow({ weekKey: prevKey, weekState: prevState, skipCloud: true }); } catch (_) {}
+
+            // Yeni haftayı belirle
+            currentWeekState = getWeekStateFromInputs();
+            currentWeekKey = computeWeekKey(currentWeekState);
+
+            // Yeni hafta datasını yükle
             loadLocalWeekOrEmpty();
+
             // Auto sync açıksa yeni hafta için bulutla çöz
             cloudAutoSyncResolveForWeek();
         }
@@ -3991,6 +4153,12 @@
             initTimeSelector();
             setupEventsAutoSave();
 
+            // Mevcut haftayı giriş alanlarından set et (local/bulut key’leri için)
+            try {
+                currentWeekState = getWeekStateFromInputs();
+                currentWeekKey = computeWeekKey(currentWeekState);
+            } catch (_) {}
+
             // Etkinlikleri localStorage'dan geri yükle (varsa)
             const restored = loadEventsStateFromStorage();
 
@@ -4012,6 +4180,7 @@
                 const autoEl = document.getElementById('cloudAutoSync');
                 if (autoEl) autoEl.checked = !!cfg.auto;
                 if (cfg.auto) setCloudStatus('🔁 Otomatik senkron açık');
+                updateCloudAuthStatusUI();
             } catch (_) {}
 
             // Otomatik senkron açıksa bu haftayı bulutla otomatik eşitle
