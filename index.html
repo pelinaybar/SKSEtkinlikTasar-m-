@@ -478,6 +478,35 @@
                 <button class="btn btn-secondary" onclick="document.getElementById('eventsJsonInput').click()" style="background:#6c757d; color:white;">📥 JSON'dan Etkinlik Yükle</button>
                 <input type="file" id="eventsJsonInput" accept="application/json" style="display:none;" onchange="importEventsFromJSONFile(event)">
             </div>
+
+            <!-- Bulut Senkron (Ücretsiz DB: Supabase) -->
+            <div style="margin-top: 20px; padding: 14px; border: 2px dashed #cfe2ff; background: #eef5ff; border-radius: 10px;">
+                <div style="font-weight: 800; color:#0b4aa2; margin-bottom: 8px;">☁️ Bulut Senkron (Supabase - Ücretsiz)</div>
+                <div style="font-size: 12px; color:#234; line-height: 1.5; margin-bottom: 10px;">
+                    Bu bölüm, etkinlikleri tarayıcı yenilense bile <b>ortak bir online veritabanında</b> saklamanızı sağlar.
+                    <br><b>Not:</b> Güvenlik için Supabase’de RLS/policy ayarlamanız önerilir.
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Supabase URL</div>
+                        <input id="supabaseUrl" type="text" placeholder="https://xxxx.supabase.co" style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
+                    </div>
+                    <div>
+                        <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Anon Key</div>
+                        <input id="supabaseAnonKey" type="password" placeholder="eyJhbGciOi..." style="width:100%; padding:10px; border:2px solid #cfe2ff; border-radius:8px; font-size:13px;">
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; align-items:center;">
+                    <button class="btn btn-info" onclick="saveSupabaseConfig()" style="background:#0d6efd; color:white;">💾 Ayarları Kaydet</button>
+                    <button class="btn btn-secondary" onclick="cloudPullEvents()" style="background:#6c757d; color:white;">⬇️ Buluttan Çek</button>
+                    <button class="btn btn-success" onclick="cloudPushEvents()" style="background:#198754; color:white;">⬆️ Buluta Gönder</button>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#234; padding:6px 10px; background:#fff; border-radius:8px; border:1px solid #cfe2ff;">
+                        <input type="checkbox" id="cloudAutoSync" onchange="toggleCloudAutoSync()" />
+                        Otomatik senkron
+                    </label>
+                    <span id="cloudSyncStatus" style="font-size:12px; color:#234; opacity:0.9;"></span>
+                </div>
+            </div>
             
             <!-- Logo Yönetimi -->
             <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #1a5f5f;">
@@ -1027,6 +1056,155 @@
         // Etkinlik verisini yenilemede kaybetmemek için localStorage'a otomatik kaydet/geri yükle
         const EVENTS_STORAGE_KEY = 'sks_events_state_v1';
         let _eventsSaveTimer = null;
+        let _cloudSaveTimer = null;
+
+        const CLOUD_CFG_KEYS = {
+            url: 'sks_supabase_url',
+            anon: 'sks_supabase_anon',
+            auto: 'sks_supabase_auto_sync'
+        };
+
+        function setCloudStatus(text) {
+            const el = document.getElementById('cloudSyncStatus');
+            if (el) el.textContent = text || '';
+        }
+
+        function getSupabaseConfig() {
+            const url = (localStorage.getItem(CLOUD_CFG_KEYS.url) || '').trim();
+            const anonKey = (localStorage.getItem(CLOUD_CFG_KEYS.anon) || '').trim();
+            const auto = (localStorage.getItem(CLOUD_CFG_KEYS.auto) || 'false') === 'true';
+            return { url, anonKey, auto };
+        }
+
+        function saveSupabaseConfig() {
+            const url = (document.getElementById('supabaseUrl')?.value || '').trim();
+            const anonKey = (document.getElementById('supabaseAnonKey')?.value || '').trim();
+            if (!url || !anonKey) {
+                alert('❌ Supabase URL ve Anon Key gerekli.');
+                return;
+            }
+            localStorage.setItem(CLOUD_CFG_KEYS.url, url);
+            localStorage.setItem(CLOUD_CFG_KEYS.anon, anonKey);
+            setCloudStatus('✅ Ayarlar kaydedildi.');
+        }
+
+        function toggleCloudAutoSync() {
+            const checked = !!document.getElementById('cloudAutoSync')?.checked;
+            localStorage.setItem(CLOUD_CFG_KEYS.auto, checked ? 'true' : 'false');
+            setCloudStatus(checked ? '🔁 Otomatik senkron açık' : '⏸️ Otomatik senkron kapalı');
+        }
+
+        function getWeekKeyForCloud() {
+            const w = getWeekStateFromInputs();
+            const base = `${w.startDate || ''}_${w.endDate || ''}`.trim();
+            const key = normalizeKey(base) || 'default';
+            return `week_${key}`;
+        }
+
+        async function supabaseRequest(path, { method = 'GET', headers = {}, body } = {}) {
+            const cfg = getSupabaseConfig();
+            if (!cfg.url || !cfg.anonKey) throw new Error('Supabase ayarları eksik.');
+            const url = cfg.url.replace(/\/+$/, '') + path;
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    apikey: cfg.anonKey,
+                    Authorization: `Bearer ${cfg.anonKey}`,
+                    'Content-Type': 'application/json',
+                    ...headers
+                },
+                body: body ? JSON.stringify(body) : undefined
+            });
+            const text = await res.text();
+            let data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (_) { data = text; }
+            if (!res.ok) {
+                const msg = typeof data === 'string' ? data : (data?.message || data?.error_description || JSON.stringify(data));
+                throw new Error(`Supabase hata: ${res.status} ${msg}`);
+            }
+            return data;
+        }
+
+        // Tablo: public.events_state (week_key text primary key, payload jsonb, updated_at timestamptz default now())
+        async function cloudPushEvents() {
+            try {
+                setCloudStatus('⬆️ Buluta gönderiliyor...');
+                const week_key = getWeekKeyForCloud();
+                const payload = {
+                    version: 1,
+                    savedAt: new Date().toISOString(),
+                    week: getWeekStateFromInputs(),
+                    dayDateISO: { ...dayDateISO },
+                    events: serializeEventsForStorage(events)
+                };
+                const body = [{ week_key, payload }];
+                await supabaseRequest(`/rest/v1/events_state`, {
+                    method: 'POST',
+                    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+                    body
+                });
+                setCloudStatus('✅ Buluta kaydedildi.');
+            } catch (e) {
+                console.error(e);
+                setCloudStatus('❌ Buluta gönderilemedi.');
+                alert('❌ Buluta gönderme hatası: ' + (e?.message || e));
+            }
+        }
+
+        async function cloudPullEvents() {
+            try {
+                setCloudStatus('⬇️ Buluttan çekiliyor...');
+                const week_key = getWeekKeyForCloud();
+                const data = await supabaseRequest(`/rest/v1/events_state?week_key=eq.${encodeURIComponent(week_key)}&select=payload`, {
+                    method: 'GET'
+                });
+                const row = Array.isArray(data) ? data[0] : null;
+                if (!row?.payload) {
+                    setCloudStatus('ℹ️ Bulutta veri bulunamadı.');
+                    alert('ℹ️ Bulutta bu hafta için kayıt bulunamadı.');
+                    return;
+                }
+
+                // Yerel veri varsa sor
+                const hasLocal = Object.keys(events || {}).some((k) => (events[k]?.events || []).length > 0);
+                if (hasLocal) {
+                    const ok = confirm('Bulutta kayıt bulundu. Mevcut yerel etkinliklerin üzerine yazılsın mı?');
+                    if (!ok) {
+                        setCloudStatus('⏸️ İptal edildi.');
+                        return;
+                    }
+                }
+
+                const payload = row.payload;
+                if (payload.week) setWeekStateToInputs(payload.week);
+                if (payload.dayDateISO && typeof payload.dayDateISO === 'object') {
+                    Object.keys(payload.dayDateISO).forEach((k) => { dayDateISO[k] = payload.dayDateISO[k]; });
+                }
+                if (payload.events && typeof payload.events === 'object') {
+                    events = payload.events;
+                } else {
+                    events = {};
+                }
+                hydrateEventsAfterLoad();
+                refreshEventLogosFromDatabase();
+                renderEvents();
+                saveEventsStateNow();
+                setCloudStatus('✅ Buluttan yüklendi.');
+            } catch (e) {
+                console.error(e);
+                setCloudStatus('❌ Buluttan çekilemedi.');
+                alert('❌ Buluttan çekme hatası: ' + (e?.message || e));
+            }
+        }
+
+        function scheduleCloudPush() {
+            const cfg = getSupabaseConfig();
+            if (!cfg.auto) return;
+            clearTimeout(_cloudSaveTimer);
+            _cloudSaveTimer = setTimeout(() => {
+                cloudPushEvents();
+            }, 800);
+        }
 
         function getWeekStateFromInputs() {
             const startDate = (document.getElementById('startDate')?.value || '').trim();
@@ -1100,6 +1278,7 @@
                     events: serializeEventsForStorage(events)
                 };
                 localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(payload));
+                scheduleCloudPush();
             } catch (e) {
                 console.warn('Etkinlikler kaydedilemedi:', e);
             }
@@ -3695,6 +3874,18 @@
                 // Eğer gün seçiliyse, o gün için kaydedilmiş tarihi otomatik doldur
                 try { suggestDateForDay(); } catch (_) {}
             }
+
+            // Bulut senkron UI'ını localStorage'daki ayarlarla doldur
+            try {
+                const cfg = getSupabaseConfig();
+                const urlEl = document.getElementById('supabaseUrl');
+                const keyEl = document.getElementById('supabaseAnonKey');
+                if (urlEl) urlEl.value = cfg.url || '';
+                if (keyEl) keyEl.value = cfg.anonKey || '';
+                const autoEl = document.getElementById('cloudAutoSync');
+                if (autoEl) autoEl.checked = !!cfg.auto;
+                if (cfg.auto) setCloudStatus('🔁 Otomatik senkron açık');
+            } catch (_) {}
         };
     </script>
 </body>
