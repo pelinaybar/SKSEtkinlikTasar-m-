@@ -2585,17 +2585,19 @@
 
         function socialPageWrapper(innerHtml) {
             // IG story / vertical post oranı: 1080 x 1350
+            // Minimal, tasarım sistemine yakın bir görünüm
             return `
                 <div class="social-page" style="
                     width: 1080px; height: 1350px;
-                    background: linear-gradient(135deg, #0f3f3f 0%, #1a5f5f 45%, #2a7a7a 100%);
+                    background: linear-gradient(135deg, #0f3f3f 0%, #1a5f5f 55%, #2a7a7a 100%);
                     border-radius: 22px;
                     overflow: hidden;
                     position: relative;
                     box-shadow: 0 18px 60px rgba(0,0,0,0.25);
                     font-family: Arial, sans-serif;
                 ">
-                    <div style="position:absolute; inset:0; background: rgba(0,0,0,0.12);"></div>
+                    <div style="position:absolute; inset:0; background: rgba(0,0,0,0.18);"></div>
+                    <div style="position:absolute; inset:0; background: radial-gradient(circle at 20% 10%, rgba(255,255,255,0.08), transparent 45%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.06), transparent 55%);"></div>
                     <div style="position:relative; height:100%; padding: 44px 52px;">
                         ${innerHtml}
                     </div>
@@ -2604,49 +2606,89 @@
         }
 
         function renderSocialSummaryPage(startDate, endDate, dayOrder, logoCache) {
-            const dayCards = dayOrder
-                .filter((day) => (events?.[day]?.events || []).length > 0)
-                .map((day) => {
-                    const d = events[day];
-                    const uniqClubs = [...new Set((d.events || []).map(e => canonicalizeClubName(e.clubName) || e.clubName).filter(Boolean))];
-                    const logos = uniqClubs.slice(0, 10).map((club) => {
-                        const b64 = getLogoForClubForSocial(club, logoCache);
-                        return `
-                            <div style="width: 46px; height: 46px; border-radius: 12px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(0,0,0,0.06);">
-                                ${b64 ? `<img src="${b64}" style="width: 40px; height: 40px; object-fit: contain; display:block;">` : `<span style="font-size:22px;">🎯</span>`}
-                            </div>
-                        `;
-                    }).join('');
-                    const extra = uniqClubs.length > 10 ? `<div style="font-size:12px; color:rgba(255,255,255,0.85); margin-left:auto;">+${uniqClubs.length - 10}</div>` : '';
+            // Takvim görünümü (örneğe yakın): gün kutuları + içlerinde logolar
+            const dayAbbr = {
+                Pazartesi: 'PZT', Salı: 'SAL', Çarşamba: 'ÇAR', Perşembe: 'PER', Cuma: 'CUM', Cumartesi: 'CMT', Pazar: 'PAZ'
+            };
+            const tileColors = {
+                Pazartesi: '#9b59b6',
+                Salı: '#ff4f87',
+                Çarşamba: '#6c5ce7',
+                Perşembe: '#f1c40f',
+                Cuma: '#27ae60',
+                Cumartesi: '#00bcd4',
+                Pazar: '#ff8a3d'
+            };
+
+            function dayNumberFromDay(day) {
+                const iso = events?.[day]?.isoDate;
+                if (iso) {
+                    const d = new Date(iso);
+                    if (!Number.isNaN(d.getTime())) return String(d.getDate());
+                }
+                const txt = events?.[day]?.date || '';
+                const m = txt.match(/(\d{1,2})/);
+                return m ? m[1] : '';
+            }
+
+            const tiles = dayOrder.map((day) => {
+                const list = (events?.[day]?.events || []);
+                const uniqClubs = [...new Set(list.map(e => canonicalizeClubName(e.clubName) || e.clubName).filter(Boolean))];
+                const logos = uniqClubs.slice(0, 6).map((club) => {
+                    const b64 = getLogoForClubForSocial(club, logoCache);
                     return `
-                        <div style="background: rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 18px 18px;">
-                            <div style="display:flex; align-items:baseline; gap:12px; margin-bottom: 12px;">
-                                <div style="font-size:18px; font-weight:800; color:#fff;">${escapeHtml(day.toUpperCase())}</div>
-                                <div style="font-size:14px; font-weight:700; color: rgba(255,255,255,0.85);">${escapeHtml(d.date || '')}</div>
-                            </div>
-                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                                ${logos}
-                                ${extra}
-                            </div>
+                        <div style="width: 54px; height: 54px; border-radius: 50%; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; border: 3px solid rgba(255,255,255,0.55); box-shadow: 0 6px 14px rgba(0,0,0,0.18);">
+                            ${b64 ? `<img src="${b64}" style="width: 46px; height: 46px; object-fit: contain; display:block;">` : `<span style="font-size:24px;">🎯</span>`}
                         </div>
                     `;
-                })
-                .join('');
+                }).join('');
+                const extra = uniqClubs.length > 6 ? `<div style="font-size: 16px; font-weight: 900; color: rgba(255,255,255,0.95);">+${uniqClubs.length - 6}</div>` : '';
+                const hasEvents = list.length > 0;
+
+                return `
+                    <div style="
+                        background: ${tileColors[day] || '#666'};
+                        border-radius: 20px;
+                        padding: 18px 18px;
+                        position: relative;
+                        overflow: hidden;
+                        box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+                        border: 1px solid rgba(255,255,255,0.20);
+                        min-height: 220px;
+                    ">
+                        <div style="position:absolute; inset:0; opacity:0.18; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,1), transparent 45%), radial-gradient(circle at 80% 80%, rgba(0,0,0,1), transparent 55%);"></div>
+                        <div style="position:relative; display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 14px;">
+                            <div style="font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.92); letter-spacing: 0.4px;">ETKİNLİK</div>
+                            <div style="text-align:right; color:#fff;">
+                                <div style="font-size: 14px; font-weight: 900;">${dayAbbr[day] || ''}</div>
+                                <div style="font-size: 34px; line-height: 1; font-weight: 900;">${escapeHtml(dayNumberFromDay(day))}</div>
+                            </div>
+                        </div>
+                        <div style="position:relative; display:flex; gap: 10px; flex-wrap:wrap; align-items:center; min-height: 120px; opacity:${hasEvents ? 1 : 0.25};">
+                            ${hasEvents ? logos : `<div style="color: rgba(255,255,255,0.85); font-weight: 800;">—</div>`}
+                            ${hasEvents ? extra : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
             return socialPageWrapper(`
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 26px;">
-                    <div style="color:#fff;">
-                        <div style="font-size:44px; font-weight:900; letter-spacing:0.5px;">${escapeHtml(startDate)} – ${escapeHtml(endDate)}</div>
-                        <div style="font-size:22px; font-weight:800; opacity:0.95; margin-top: 8px;">Öğrenci Kulübü Etkinlikleri</div>
-                    </div>
+                <div style="color:#fff; margin-bottom: 26px;">
+                    <div style="font-size: 56px; font-weight: 900; letter-spacing: 0.4px;">${escapeHtml(startDate)}–${escapeHtml(endDate)} ${escapeHtml((() => {
+                        // yıl tahmini
+                        const anyIso = Object.values(events || {}).map(d => d?.isoDate).find(Boolean);
+                        if (anyIso) { const dd = new Date(anyIso); if (!Number.isNaN(dd.getTime())) return dd.getFullYear(); }
+                        return new Date().getFullYear();
+                    })())}</div>
+                    <div style="font-size: 22px; font-weight: 800; opacity: 0.95; margin-top: 8px;">ÖĞRENCİ KULÜBÜ ETKİNLİKLERİ</div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr; gap: 14px;">
-                    ${dayCards || `<div style="color:#fff; font-size:18px;">Bu hafta için etkinlik yok.</div>`}
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+                    ${tiles}
                 </div>
 
-                <div style="position:absolute; left:52px; right:52px; bottom:44px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.9); font-size:14px;">
-                    <div>Detaylı bilgi: www.sks.uskudar.edu.tr</div>
+                <div style="position:absolute; left:52px; right:52px; bottom:44px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.92); font-size:14px;">
+                    <div>Detaylı bilgi: sks.uskudar.edu.tr</div>
                     <div>@uskudarsks</div>
                 </div>
             `);
@@ -2656,23 +2698,27 @@
             const title = `${escapeHtml(events?.[day]?.date || '')} · ${escapeHtml(day.toUpperCase())}`;
             const subtitle = totalChunks > 1 ? `(${chunkIndex + 1}/${totalChunks})` : '';
 
+            // Minimal kartlar (tasarımdaki gibi): az gölge, renk şeridi, temiz tipografi
             const cards = (chunkEvents || []).map((ev) => {
                 const club = canonicalizeClubName(ev.clubName) || ev.clubName;
                 const b64 = getLogoForClubForSocial(club, logoCache);
                 const locText = ev.isOnline ? 'ZOOM Çevrimiçi' : (ev.location || '');
                 return `
-                    <div style="background:#ffffff; border-radius: 22px; padding: 18px 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.14); border: 1px solid rgba(0,0,0,0.06); height: 100%; display:flex; gap: 14px;">
-                        <div style="width: 74px; height: 74px; border-radius: 18px; background:#f6f7f8; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border:1px solid rgba(0,0,0,0.06);">
-                            ${b64 ? `<img src="${b64}" style="width: 64px; height: 64px; object-fit: contain; display:block;">` : `<span style="font-size:28px;">🎯</span>`}
-                        </div>
-                        <div style="min-width:0; display:flex; flex-direction:column; width:100%;">
-                            <div style="font-size:14px; font-weight:800; color:#1a5f5f; line-height:1.2; margin-bottom: 8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(club || '')}</div>
-                            <div style="font-size:22px; font-weight:900; color:${dayColor.main}; line-height:1.15; margin-bottom: 14px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${escapeHtml(ev.eventTitle || '')}</div>
-                            <div style="margin-top:auto; display:flex; gap:12px; align-items:flex-end; justify-content:space-between;">
-                                <div style="font-size:18px; font-weight:900; color:#1a5f5f;">🕐 ${escapeHtml(ev.time || '')}</div>
-                                <div style="font-size:14px; font-weight:800; color:#6c757d; text-align:right; max-width: 60%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">📍 ${escapeHtml(locText)}</div>
+                    <div style="background: rgba(255,255,255,0.96); border-radius: 18px; overflow:hidden; border: 1px solid rgba(0,0,0,0.08); height: 100%; box-shadow: 0 10px 22px rgba(0,0,0,0.14);">
+                        <div style="height: 10px; background:${dayColor.main};"></div>
+                        <div style="padding: 16px 16px; display:flex; gap: 14px;">
+                            <div style="width: 68px; height: 68px; border-radius: 16px; background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border:1px solid rgba(0,0,0,0.08);">
+                                ${b64 ? `<img src="${b64}" style="width: 58px; height: 58px; object-fit: contain; display:block;">` : `<span style="font-size:26px;">🎯</span>`}
                             </div>
-                            ${ev.campus ? `<div style="margin-top: 8px; font-size:13px; font-weight:800; color:#2a7a7a;">${escapeHtml(ev.campus)}</div>` : ''}
+                            <div style="min-width:0; display:flex; flex-direction:column; width:100%;">
+                                <div style="font-size:13px; font-weight:900; color:#1a5f5f; line-height:1.2; margin-bottom: 6px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(club || '')}</div>
+                                <div style="font-size:20px; font-weight:900; color:#0f3f3f; line-height:1.15; margin-bottom: 10px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${escapeHtml(ev.eventTitle || '')}</div>
+                                <div style="margin-top:auto; display:flex; gap:10px; align-items:flex-end; justify-content:space-between;">
+                                    <div style="font-size:18px; font-weight:900; color:${dayColor.main};">🕐 ${escapeHtml(ev.time || '')}</div>
+                                    <div style="font-size:13px; font-weight:800; color:#6c757d; text-align:right; max-width: 62%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">📍 ${escapeHtml(locText)}</div>
+                                </div>
+                                ${ev.campus ? `<div style="margin-top: 8px; font-size:12px; font-weight:900; color:#2a7a7a;">${escapeHtml(ev.campus)}</div>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
