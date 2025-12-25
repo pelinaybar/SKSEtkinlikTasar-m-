@@ -498,6 +498,8 @@
             <div class="button-group" style="margin-top: 30px; justify-content: center;">
                 <button class="btn btn-success" onclick="convertToDesign()" style="background: #28a745; padding: 12px 30px; font-size: 16px;">🎨 Tasarıma Dönüştür</button>
                 <button class="btn btn-primary" onclick="downloadDesign()" id="downloadBtn" style="display: none; background: #1a5f5f;">💾 Tasarımı İndir</button>
+                <button class="btn btn-success" onclick="convertToSocialPoster()" style="background:#6f42c1; padding: 12px 22px; font-size: 16px;">📱 Sosyal Medya Afişi</button>
+                <button class="btn btn-primary" onclick="downloadSocialPosters()" id="socialDownloadBtn" style="display: none; background:#4b2bb7;">💾 Sosyal Afişleri İndir</button>
                 <button class="btn btn-info" onclick="exportEventsToJSON()" style="background:#17a2b8; color:white;">📤 Etkinlikleri JSON'a Aktar</button>
                 <button class="btn btn-secondary" onclick="document.getElementById('eventsJsonInput').click()" style="background:#6c757d; color:white;">📥 JSON'dan Etkinlik Yükle</button>
                 <input type="file" id="eventsJsonInput" accept="application/json" style="display:none;" onchange="importEventsFromJSONFile(event)">
@@ -738,6 +740,7 @@
             
             <!-- Tasarım Önizleme -->
             <div id="designPreview" style="display: none; margin-top: 30px; padding: 40px 20px; background: #f8f9fa; border-radius: 8px;"></div>
+            <div id="socialPreview" style="display: none; margin-top: 20px; padding: 24px 20px; background: #f8f9fa; border-radius: 8px;"></div>
         </div>
     </div>
 
@@ -2503,6 +2506,329 @@
             }, 500);
             
             preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ==========================
+        // 📱 Sosyal Medya Afişi
+        // - 1. sayfa: Etkinlik olan günler + kulüp logoları
+        // - Sonraki sayfalar: Günlere göre, sayfa başına max 4 etkinlik (2x2)
+        // ==========================
+        let socialPosterPages = [];
+        let socialPosterMeta = { weekKey: '', startDate: '', endDate: '' };
+
+        function chunkArray(arr, size) {
+            const out = [];
+            for (let i = 0; i < (arr || []).length; i += size) out.push(arr.slice(i, i + size));
+            return out;
+        }
+
+        async function ensureHtml2CanvasLoaded() {
+            if (typeof html2canvas !== 'undefined') return;
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            document.head.appendChild(script);
+            await new Promise((resolve) => { script.onload = resolve; });
+        }
+
+        async function buildLogoCacheForSocial() {
+            // Tasarımda olduğu gibi: logo path -> base64 cache
+            refreshEventLogosFromDatabase();
+            const logoCache = {};
+            const unique = new Set();
+
+            Object.values(events || {}).forEach((day) => {
+                (day?.events || []).forEach((ev) => {
+                    const src = ev?.clubIcon || '';
+                    if (typeof src === 'string' && src.startsWith('data:')) {
+                        if (ev?.clubName) logoCache[ev.clubName] = src;
+                        logoCache[src] = src;
+                    } else if (typeof src === 'string' && src.startsWith('logos/')) {
+                        unique.add(src);
+                    }
+                });
+            });
+
+            for (const p of unique) {
+                let b64 = null;
+                // 1) base64 veritabanı
+                for (const club in (clubLogoBase64Database || {})) {
+                    if (clubLogoDatabase?.[club] === p && clubLogoBase64Database[club]) {
+                        b64 = clubLogoBase64Database[club];
+                        break;
+                    }
+                }
+                // 2) sayfadan veya dosyadan canvas
+                if (!b64) b64 = await loadLogoAsBase64(p);
+                if (b64) logoCache[p] = b64;
+            }
+
+            // Header logoları (varsa)
+            const headerUu = localStorage.getItem('headerUULogoBase64');
+            const headerSks = localStorage.getItem('headerSKSLogoBase64');
+            const header = {
+                uu: (headerUu && headerUu.startsWith('data:')) ? headerUu : null,
+                sks: (headerSks && headerSks.startsWith('data:')) ? headerSks : null
+            };
+            return { logoCache, header };
+        }
+
+        function getLogoForClubForSocial(clubName, logoCache) {
+            if (!clubName) return null;
+            const canon = canonicalizeClubName(clubName) || clubName;
+            // base64 öncelik
+            if (logoCache?.[canon] && (logoCache[canon] || '').startsWith('data:')) return logoCache[canon];
+            const src = getLogoSource(canon);
+            if (src && src.startsWith('data:')) return src;
+            if (src && src.startsWith('logos/') && logoCache?.[src]) return logoCache[src];
+            return null;
+        }
+
+        function socialPageWrapper(innerHtml) {
+            // IG story / vertical post oranı: 1080 x 1350
+            return `
+                <div class="social-page" style="
+                    width: 1080px; height: 1350px;
+                    background: linear-gradient(135deg, #0f3f3f 0%, #1a5f5f 45%, #2a7a7a 100%);
+                    border-radius: 22px;
+                    overflow: hidden;
+                    position: relative;
+                    box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+                    font-family: Arial, sans-serif;
+                ">
+                    <div style="position:absolute; inset:0; background: rgba(0,0,0,0.12);"></div>
+                    <div style="position:relative; height:100%; padding: 44px 52px;">
+                        ${innerHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSocialSummaryPage(startDate, endDate, dayOrder, logoCache) {
+            const dayCards = dayOrder
+                .filter((day) => (events?.[day]?.events || []).length > 0)
+                .map((day) => {
+                    const d = events[day];
+                    const uniqClubs = [...new Set((d.events || []).map(e => canonicalizeClubName(e.clubName) || e.clubName).filter(Boolean))];
+                    const logos = uniqClubs.slice(0, 10).map((club) => {
+                        const b64 = getLogoForClubForSocial(club, logoCache);
+                        return `
+                            <div style="width: 46px; height: 46px; border-radius: 12px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(0,0,0,0.06);">
+                                ${b64 ? `<img src="${b64}" style="width: 40px; height: 40px; object-fit: contain; display:block;">` : `<span style="font-size:22px;">🎯</span>`}
+                            </div>
+                        `;
+                    }).join('');
+                    const extra = uniqClubs.length > 10 ? `<div style="font-size:12px; color:rgba(255,255,255,0.85); margin-left:auto;">+${uniqClubs.length - 10}</div>` : '';
+                    return `
+                        <div style="background: rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 18px 18px;">
+                            <div style="display:flex; align-items:baseline; gap:12px; margin-bottom: 12px;">
+                                <div style="font-size:18px; font-weight:800; color:#fff;">${escapeHtml(day.toUpperCase())}</div>
+                                <div style="font-size:14px; font-weight:700; color: rgba(255,255,255,0.85);">${escapeHtml(d.date || '')}</div>
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                ${logos}
+                                ${extra}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
+            return socialPageWrapper(`
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 26px;">
+                    <div style="color:#fff;">
+                        <div style="font-size:44px; font-weight:900; letter-spacing:0.5px;">${escapeHtml(startDate)} – ${escapeHtml(endDate)}</div>
+                        <div style="font-size:22px; font-weight:800; opacity:0.95; margin-top: 8px;">Öğrenci Kulübü Etkinlikleri</div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr; gap: 14px;">
+                    ${dayCards || `<div style="color:#fff; font-size:18px;">Bu hafta için etkinlik yok.</div>`}
+                </div>
+
+                <div style="position:absolute; left:52px; right:52px; bottom:44px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.9); font-size:14px;">
+                    <div>Detaylı bilgi: www.sks.uskudar.edu.tr</div>
+                    <div>@uskudarsks</div>
+                </div>
+            `);
+        }
+
+        function renderSocialDayPage(day, dayColor, chunkIndex, totalChunks, chunkEvents, logoCache) {
+            const title = `${escapeHtml(events?.[day]?.date || '')} · ${escapeHtml(day.toUpperCase())}`;
+            const subtitle = totalChunks > 1 ? `(${chunkIndex + 1}/${totalChunks})` : '';
+
+            const cards = (chunkEvents || []).map((ev) => {
+                const club = canonicalizeClubName(ev.clubName) || ev.clubName;
+                const b64 = getLogoForClubForSocial(club, logoCache);
+                const locText = ev.isOnline ? 'ZOOM Çevrimiçi' : (ev.location || '');
+                return `
+                    <div style="background:#ffffff; border-radius: 22px; padding: 18px 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.14); border: 1px solid rgba(0,0,0,0.06); height: 100%; display:flex; gap: 14px;">
+                        <div style="width: 74px; height: 74px; border-radius: 18px; background:#f6f7f8; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border:1px solid rgba(0,0,0,0.06);">
+                            ${b64 ? `<img src="${b64}" style="width: 64px; height: 64px; object-fit: contain; display:block;">` : `<span style="font-size:28px;">🎯</span>`}
+                        </div>
+                        <div style="min-width:0; display:flex; flex-direction:column; width:100%;">
+                            <div style="font-size:14px; font-weight:800; color:#1a5f5f; line-height:1.2; margin-bottom: 8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(club || '')}</div>
+                            <div style="font-size:22px; font-weight:900; color:${dayColor.main}; line-height:1.15; margin-bottom: 14px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${escapeHtml(ev.eventTitle || '')}</div>
+                            <div style="margin-top:auto; display:flex; gap:12px; align-items:flex-end; justify-content:space-between;">
+                                <div style="font-size:18px; font-weight:900; color:#1a5f5f;">🕐 ${escapeHtml(ev.time || '')}</div>
+                                <div style="font-size:14px; font-weight:800; color:#6c757d; text-align:right; max-width: 60%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">📍 ${escapeHtml(locText)}</div>
+                            </div>
+                            ${ev.campus ? `<div style="margin-top: 8px; font-size:13px; font-weight:800; color:#2a7a7a;">${escapeHtml(ev.campus)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 2x2 grid (max 4)
+            const grid = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 18px; height: 100%;">
+                    ${cards}
+                    ${(chunkEvents || []).length < 4 ? `<div></div>`.repeat(4 - (chunkEvents || []).length) : ''}
+                </div>
+            `;
+
+            return socialPageWrapper(`
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px;">
+                    <div>
+                        <div style="font-size:28px; font-weight:900; color:#fff;">${title} <span style="font-size:16px; font-weight:800; opacity:0.9;">${subtitle}</span></div>
+                        <div style="font-size:16px; font-weight:800; color:rgba(255,255,255,0.88); margin-top: 6px;">Haftalık Program</div>
+                    </div>
+                    <div style="background:${dayColor.main}; color:#fff; padding:10px 14px; border-radius: 14px; font-weight:900; font-size:14px;">ETKİNLİK</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 18px; height: 1040px;">
+                    ${grid}
+                </div>
+
+                <div style="position:absolute; left:52px; right:52px; bottom:44px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.9); font-size:14px;">
+                    <div>www.sks.uskudar.edu.tr</div>
+                    <div>@uskudarsks</div>
+                </div>
+            `);
+        }
+
+        async function convertToSocialPoster() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert('Lütfen tarih aralığını girin!');
+                return;
+            }
+
+            const dayColors = {
+                'Pazartesi': { main: '#e74c3c', light: '#fadbd8' },
+                'Salı': { main: '#f39c12', light: '#fdebd0' },
+                'Çarşamba': { main: '#f1c40f', light: '#fef9e7' },
+                'Perşembe': { main: '#2ecc71', light: '#d5f4e6' },
+                'Cuma': { main: '#3498db', light: '#d6eaf8' },
+                'Cumartesi': { main: '#9b59b6', light: '#ebdef0' },
+                'Pazar': { main: '#e67e22', light: '#fae5d3' }
+            };
+            const dayOrder = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+
+            // logo cache hazırla
+            const socialPreview = document.getElementById('socialPreview');
+            socialPreview.style.display = 'block';
+            socialPreview.innerHTML = '<div style="text-align:center; padding: 24px; color:#666;">🔄 Sosyal afiş hazırlanıyor...</div>';
+
+            const { logoCache } = await buildLogoCacheForSocial();
+
+            socialPosterPages = [];
+            socialPosterMeta = { weekKey: computeWeekKey({ startDate, endDate }), startDate, endDate };
+
+            // 1) Özet sayfa
+            socialPosterPages.push(renderSocialSummaryPage(startDate, endDate, dayOrder, logoCache));
+
+            // 2) Gün sayfaları (4’erli)
+            dayOrder.forEach((day) => {
+                const list = (events?.[day]?.events || []);
+                if (!list.length) return;
+                const chunks = chunkArray(list, 4);
+                chunks.forEach((chunk, idx) => {
+                    socialPosterPages.push(renderSocialDayPage(day, dayColors[day], idx, chunks.length, chunk, logoCache));
+                });
+            });
+
+            // Önizleme: sayfaları alt alta (scale ile)
+            const pagesHtml = socialPosterPages.map((p, i) => `
+                <div style="margin: 18px auto; display:flex; justify-content:center;">
+                    <div style="transform: scale(0.35); transform-origin: top center;">
+                        ${p}
+                    </div>
+                </div>
+            `).join('');
+            socialPreview.innerHTML = `
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+                    <div style="font-weight:800; color:#4b2bb7;">📱 Sosyal Medya Afişleri (${socialPosterPages.length} sayfa)</div>
+                    <div style="font-size:12px; color:#666;">İndir: “Sosyal Afişleri İndir”</div>
+                </div>
+                ${pagesHtml}
+            `;
+            const btn = document.getElementById('socialDownloadBtn');
+            if (btn) btn.style.display = 'inline-block';
+            socialPreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function downloadSocialPosters() {
+            if (!socialPosterPages || socialPosterPages.length === 0) {
+                await convertToSocialPoster();
+            }
+            if (!socialPosterPages || socialPosterPages.length === 0) {
+                alert('Önce sosyal afişi oluşturun!');
+                return;
+            }
+
+            await ensureHtml2CanvasLoaded();
+
+            const btn = document.getElementById('socialDownloadBtn');
+            const originalText = btn?.textContent || '';
+            if (btn) { btn.textContent = '⏳ İndiriliyor...'; btn.disabled = true; }
+
+            try {
+                for (let i = 0; i < socialPosterPages.length; i++) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'fixed';
+                    wrapper.style.left = '-10000px';
+                    wrapper.style.top = '0';
+                    wrapper.style.width = '1080px';
+                    wrapper.style.height = '1350px';
+                    wrapper.style.background = 'transparent';
+                    wrapper.innerHTML = socialPosterPages[i];
+                    document.body.appendChild(wrapper);
+
+                    // görsel yüklenmelerini bekle
+                    await waitForImages(wrapper);
+                    if (document.fonts && document.fonts.ready) {
+                        try { await document.fonts.ready; } catch (_) {}
+                    }
+                    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+                    const canvas = await html2canvas(wrapper.querySelector('.social-page') || wrapper, {
+                        backgroundColor: null,
+                        scale: 2,
+                        logging: false,
+                        useCORS: true,
+                        allowTaint: true,
+                        foreignObjectRendering: false,
+                        imageTimeout: 30000,
+                        width: 1080,
+                        height: 1350
+                    });
+
+                    const a = document.createElement('a');
+                    a.download = `sosyal-afis-${socialPosterMeta.weekKey}-p${String(i + 1).padStart(2, '0')}.png`;
+                    a.href = canvas.toDataURL('image/png', 1.0);
+                    a.click();
+
+                    wrapper.remove();
+                    // tarayıcının download kuyruğuna nefes ver
+                    await new Promise(r => setTimeout(r, 250));
+                }
+            } catch (e) {
+                console.error('Sosyal afiş indirme hatası:', e);
+                alert('❌ Sosyal afiş indirirken hata: ' + (e?.message || e));
+            } finally {
+                if (btn) { btn.textContent = originalText || '💾 Sosyal Afişleri İndir'; btn.disabled = false; }
+            }
         }
         
         function generateDesignEvents(dayColors, logoCache = {}) {
