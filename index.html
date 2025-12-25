@@ -2750,11 +2750,11 @@
                 // Tipografi oranlama (Figma hissi): metin uzadıkça punto küçülür, kısaltma yok
                 const clubFit = fitTextForDesign(club || '', {
                     baseFont: 16,
-                    steps: [{ len: 28, font: 15 }, { len: 40, font: 14 }, { len: 56, font: 13 }]
+                    steps: [{ len: 26, font: 15 }, { len: 36, font: 14 }, { len: 48, font: 13 }, { len: 64, font: 12 }]
                 });
                 const titleFit = fitTextForDesign(ev.eventTitle || '', {
                     baseFont: 30,
-                    steps: [{ len: 18, font: 28 }, { len: 28, font: 26 }, { len: 40, font: 24 }, { len: 56, font: 22 }]
+                    steps: [{ len: 16, font: 28 }, { len: 26, font: 26 }, { len: 36, font: 24 }, { len: 48, font: 22 }, { len: 64, font: 20 }]
                 });
                 const timeFit = fitTextForDesign(ev.time || '', {
                     baseFont: 20,
@@ -2762,11 +2762,11 @@
                 });
                 const locationFit = fitTextForDesign(locText || '', {
                     baseFont: 15,
-                    steps: [{ len: 28, font: 14 }, { len: 42, font: 13 }, { len: 60, font: 12 }]
+                    steps: [{ len: 24, font: 14 }, { len: 36, font: 13 }, { len: 50, font: 12 }, { len: 70, font: 11 }]
                 });
                 const campusFit = fitTextForDesign(ev.campus || '', {
                     baseFont: 14,
-                    steps: [{ len: 26, font: 13 }, { len: 40, font: 12 }]
+                    steps: [{ len: 22, font: 13 }, { len: 32, font: 12 }, { len: 44, font: 11 }]
                 });
 
                 const CARD_PAD = 22;
@@ -2782,24 +2782,54 @@
                             <div style="width: ${LOGO_BOX}px; height: ${LOGO_BOX}px; background:#fff; border-radius: 16px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
                                 ${b64 ? `<img src="${b64}" style="width: ${LOGO_INNER}px; height: ${LOGO_INNER}px; object-fit: contain; display:block;">` : `<span style="font-size:30px;">🎯</span>`}
                             </div>
-                            <div style="min-width:0; display:flex; flex-direction:column; height: 100%; flex: 1;">
-                                <div style="color:#fff; font-size:${clubFit.fontSize}px; font-weight: 800; line-height:1.18; margin-bottom: 10px; overflow:hidden; max-height: 44px; overflow-wrap:anywhere; word-break:break-word;">
-                                    ${escapeHtml(clubFit.text || '')}
+                            <div style="min-width:0; height: 100%; flex: 1; display:grid; grid-template-rows: auto 1fr auto auto; row-gap: 12px;">
+                                <div style="
+                                    color:#fff;
+                                    font-size:${clubFit.fontSize}px;
+                                    font-weight: 800;
+                                    letter-spacing: 0.1px;
+                                    line-height: 1.16;
+                                    height: 44px;
+                                    overflow:hidden;
+                                    overflow-wrap:anywhere; word-break:break-word;
+                                ">${escapeHtml(clubFit.text || '')}</div>
+
+                                <div style="
+                                    color:#ffd700;
+                                    font-size:${titleFit.fontSize}px;
+                                    font-weight: 900;
+                                    letter-spacing: 0.1px;
+                                    line-height: 1.08;
+                                    overflow:hidden;
+                                    height: 160px;
+                                    overflow-wrap:anywhere; word-break:break-word;
+                                ">${escapeHtml(titleFit.text || '')}</div>
+
+                                <div style="display:flex; align-items:flex-end; justify-content:space-between; gap: 14px;">
+                                    <div style="color:${timeColor}; font-size:${timeFit.fontSize}px; font-weight: 900; white-space:nowrap; line-height:1;">🕐 ${escapeHtml(timeFit.text || '')}</div>
+                                    <div style="
+                                        color:${locationColor};
+                                        font-size:${locationFit.fontSize}px;
+                                        font-weight: 800;
+                                        text-align:right;
+                                        line-height: 1.12;
+                                        overflow:hidden;
+                                        height: 36px;
+                                        flex: 1;
+                                        overflow-wrap:anywhere; word-break:break-word;
+                                    ">📍 ${escapeHtml(locationFit.text || '')}</div>
                                 </div>
-                                <div style="color:#ffd700; font-size:${titleFit.fontSize}px; font-weight: 900; line-height:1.10; margin-bottom: 14px; overflow:hidden; max-height: 148px; overflow-wrap:anywhere; word-break:break-word;">
-                                    ${escapeHtml(titleFit.text || '')}
-                                </div>
-                                <div style="margin-top:auto; display:flex; align-items:flex-end; justify-content:space-between; gap: 14px;">
-                                    <div style="color:${timeColor}; font-size:${timeFit.fontSize}px; font-weight: 900; white-space:nowrap;">🕐 ${escapeHtml(timeFit.text || '')}</div>
-                                    <div style="color:${locationColor}; font-size:${locationFit.fontSize}px; font-weight: 800; text-align:right; overflow:hidden; max-width: 62%; max-height: 40px; overflow-wrap:anywhere; word-break:break-word;">
-                                        📍 ${escapeHtml(locationFit.text || '')}
-                                    </div>
-                                </div>
-                                ${ev.campus ? `
-                                    <div style="margin-top: 10px; color:${campusColor}; font-size:${campusFit.fontSize}px; font-weight: 900; overflow:hidden; max-height: 18px; overflow-wrap:anywhere; word-break:break-word;">
-                                        ${escapeHtml(campusFit.text || '')}
-                                    </div>
-                                ` : ''}
+
+                                <div style="
+                                    color:${ev.campus ? campusColor : 'transparent'};
+                                    font-size:${campusFit.fontSize}px;
+                                    font-weight: 900;
+                                    letter-spacing: 0.1px;
+                                    line-height: 1.1;
+                                    height: 18px;
+                                    overflow:hidden;
+                                    overflow-wrap:anywhere; word-break:break-word;
+                                ">${ev.campus ? escapeHtml(campusFit.text || '') : '.'}</div>
                             </div>
                         </div>
                     </div>
